@@ -1,0 +1,48 @@
+name: Bearing
+options:
+  bundleIdPrefix: com.austinops97
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 0.1.0
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_CFBundleDisplayName: Bearing
+    INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+    INFOPLIST_KEY_NSFaceIDUsageDescription: Bearing can use Face ID to protect your private operational information.
+    INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+    INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    SUPPORTS_MACCATALYST: NO
+    TARGETED_DEVICE_FAMILY: "1,2"
+targets:
+  Bearing:
+    type: application
+    platform: iOS
+    sources:
+      - path: Bearing
+    resources:
+      - path: Bearing/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.Bearing
+    scheme:
+      testTargets:
+        - BearingTests
+  BearingTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: BearingTests
+    dependencies:
+      - target: Bearing
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.BearingTests
