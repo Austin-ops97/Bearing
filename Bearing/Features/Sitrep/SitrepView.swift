@@ -2,9 +2,11 @@ import SwiftData
 import SwiftUI
 
 struct SitrepView: View {
+    @EnvironmentObject private var voice: VoiceEngine
     @Query private var actions: [BearingAction]
     @Query private var assets: [BearingAsset]
     @Query private var routines: [BearingRoutine]
+    @Query private var events: [BearingCalendarEvent]
     let onSearch: () -> Void
 
     private var priorityActions: [BearingAction] {
@@ -21,6 +23,12 @@ struct SitrepView: View {
 
     private var attentionCount: Int {
         actions.filter { AttentionEngine.requiresAttention($0) }.count + assets.filter { $0.status == .attention || $0.status == .unavailable }.count
+    }
+
+    private var nextEvents: [BearingCalendarEvent] {
+        events.filter { $0.endAt >= .now && Calendar.current.isDateInToday($0.startAt) }
+            .sorted { $0.startAt < $1.startAt }
+            .prefix(4).map { $0 }
     }
 
     var body: some View {
@@ -46,7 +54,9 @@ struct SitrepView: View {
         .navigationTitle("SITREP")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button(action: speakBriefing) { Image(systemName: voice.isSpeaking ? "stop.circle" : "speaker.wave.2") }
+                    .accessibilityLabel(voice.isSpeaking ? "Stop briefing" : "Speak briefing")
                 Button(action: onSearch) { Image(systemName: "magnifyingglass") }
                     .accessibilityLabel("Search Bearing")
                     .accessibilityIdentifier("search.open")
@@ -68,9 +78,13 @@ struct SitrepView: View {
     private var nextSection: some View {
         VStack(alignment: .leading, spacing: 0) {
             SectionHeading(title: "NEXT", trailing: "TODAY")
-            TimelineRow(time: "07:00", title: "Shift Turnover")
-            TimelineRow(time: "08:30", title: "Unit Checks")
-            TimelineRow(time: "09:30", title: "Operations Meeting")
+            if nextEvents.isEmpty {
+                QuietState(text: "No more scheduled events today.")
+            } else {
+                ForEach(nextEvents) { event in
+                    TimelineRow(time: event.startAt.formatted(date: .omitted, time: .shortened), title: event.title)
+                }
+            }
         }
     }
 
@@ -137,6 +151,24 @@ struct SitrepView: View {
             }
         }
     }
+
+    private func speakBriefing() {
+        if voice.isSpeaking {
+            voice.stop()
+            return
+        }
+        let next = nextEvents.first.map { "Your next commitment is \($0.title) at \($0.startAt.formatted(date: .omitted, time: .shortened))." } ?? "You have no more scheduled events today."
+        let waitingText = waiting.first.map { "You are waiting on \($0.person?.displayName ?? "someone") for \($0.title)." } ?? "You have no active waiting items."
+        voice.speak(.init(
+            key: "sitrep-briefing-\(Calendar.current.startOfDay(for: .now).timeIntervalSince1970)",
+            category: .aiPlan,
+            priority: .planGuidance,
+            brief: "\(attentionCount) items need attention. \(next)",
+            normal: "\(attentionCount) items need your attention. \(next) \(waitingText)",
+            detailed: "Here is your Bearing briefing. \(attentionCount) items need your attention. \(priorityActions.count) priority actions are surfaced. \(next) \(waitingText)",
+            cooldown: 30
+        ), userInitiated: true)
+    }
 }
 
 private struct TimelineRow: View {
@@ -202,4 +234,3 @@ private struct QuietState: View {
         Text(text).font(.subheadline).foregroundStyle(.secondary).padding(.vertical, 18)
     }
 }
-

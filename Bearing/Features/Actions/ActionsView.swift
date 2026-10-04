@@ -84,6 +84,18 @@ struct ActionDetailView: View {
                         ForEach(ActionStatus.allCases) { Text($0.label).tag($0.rawValue) }
                     }
                     if let dueAt = action.dueAt { DatePicker("Due", selection: Binding(get: { dueAt }, set: { action.dueAt = $0 })) }
+                    Picker("Timing", selection: $action.timingRaw) {
+                        ForEach(TimingClassification.allCases) { Text($0.label).tag($0.rawValue) }
+                    }
+                    Stepper(
+                        "Estimated · \(PlanningEngine.durationText(minutes: action.estimatedDurationMinutes ?? 30))",
+                        value: Binding(
+                            get: { action.estimatedDurationMinutes ?? 30 },
+                            set: { action.estimatedDurationMinutes = $0 }
+                        ),
+                        in: 5...480,
+                        step: 5
+                    )
                 }
                 if action.person != nil || action.asset != nil {
                     Section("Related") {

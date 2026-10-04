@@ -5,14 +5,14 @@ enum DemoContent {
     @MainActor
     static func seedIfNeeded(in context: ModelContext) {
 #if DEBUG
-        let descriptor = FetchDescriptor<BearingAction>()
-        guard (try? context.fetchCount(descriptor)) == 0 else { return }
-
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: .now)
         func today(_ hour: Int, _ minute: Int = 0) -> Date {
             calendar.date(byAdding: .minute, value: hour * 60 + minute, to: startOfDay) ?? .now
         }
+
+        let descriptor = FetchDescriptor<BearingAction>()
+        if (try? context.fetchCount(descriptor)) == 0 {
 
         let mike = BearingPerson(displayName: "Mike Thompson", email: "mike@example.com", organization: "Operations", role: "Maintenance Lead")
         let sarah = BearingPerson(displayName: "Sarah Jenkins", email: "sarah@example.com", organization: "Operations", role: "Operations Manager")
@@ -28,9 +28,9 @@ enum DemoContent {
         context.insert(dickerson)
         context.insert(ellwood)
 
-        let charger = BearingAction(title: "Battery charger follow-up", priority: .immediate, dueAt: calendar.date(byAdding: .hour, value: -2, to: .now), person: mike, asset: yankee)
-        let dispatch = BearingAction(title: "Confirm dispatch schedule", priority: .today, dueAt: today(8, 30), asset: dickerson)
-        let documentation = BearingAction(title: "Valve PO documentation", priority: .today, dueAt: today(10), source: "Email Maintenance")
+        let charger = BearingAction(title: "Battery charger follow-up", priority: .immediate, dueAt: calendar.date(byAdding: .hour, value: -2, to: .now), estimatedDurationMinutes: 10, timing: .deadline, person: mike, asset: yankee)
+        let dispatch = BearingAction(title: "Confirm dispatch schedule", priority: .today, dueAt: today(8, 30), estimatedDurationMinutes: 8, timing: .deadline, asset: dickerson)
+        let documentation = BearingAction(title: "Valve PO documentation", priority: .today, dueAt: today(10), estimatedDurationMinutes: 35, timing: .flexible, source: "Email Maintenance")
         let valve = BearingAction(title: "Valve confirmation", priority: .today, status: .waiting, followUpAt: today(8), waitingSince: calendar.date(byAdding: .day, value: -2, to: .now), person: mike)
         let outage = BearingAction(title: "Outage approval", priority: .planned, status: .waiting, followUpAt: calendar.date(byAdding: .day, value: 1, to: .now), waitingSince: calendar.date(byAdding: .day, value: -1, to: .now), person: sarah)
         [charger, dispatch, documentation, valve, outage].forEach(context.insert)
@@ -50,6 +50,18 @@ enum DemoContent {
         ].forEach(context.insert)
 
         try? context.save()
+        }
+
+        let eventDescriptor = FetchDescriptor<BearingCalendarEvent>()
+        if (try? context.fetchCount(eventDescriptor)) == 0 {
+            [
+                BearingCalendarEvent(title: "Shift Turnover", startAt: today(7), endAt: today(7, 30)),
+                BearingCalendarEvent(title: "Unit Checks", startAt: today(8, 30), endAt: today(9)),
+                BearingCalendarEvent(title: "Operations Meeting", startAt: today(9, 30), endAt: today(10, 30), preparationMinutes: 20),
+                BearingCalendarEvent(title: "Rounds", startAt: today(12), endAt: today(12, 30))
+            ].forEach(context.insert)
+            try? context.save()
+        }
 #endif
     }
 }

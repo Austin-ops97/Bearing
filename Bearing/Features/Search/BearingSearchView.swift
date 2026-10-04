@@ -7,6 +7,7 @@ struct BearingSearchView: View {
     @Query private var people: [BearingPerson]
     @Query private var assets: [BearingAsset]
     @Query private var logs: [BearingLogEntry]
+    @Query private var events: [BearingCalendarEvent]
     @State private var query = ""
     @FocusState private var focused: Bool
 
@@ -15,6 +16,7 @@ struct BearingSearchView: View {
     private var matchingPeople: [BearingPerson] { people.filter { $0.displayName.lowercased().contains(normalized) || $0.organization?.lowercased().contains(normalized) == true } }
     private var matchingAssets: [BearingAsset] { assets.filter { $0.name.lowercased().contains(normalized) || $0.details.lowercased().contains(normalized) } }
     private var matchingLogs: [BearingLogEntry] { logs.filter { $0.text.lowercased().contains(normalized) } }
+    private var matchingEvents: [BearingCalendarEvent] { events.filter { $0.title.lowercased().contains(normalized) || $0.notes.lowercased().contains(normalized) } }
 
     var body: some View {
         NavigationStack {
@@ -28,9 +30,10 @@ struct BearingSearchView: View {
                         if !matchingPeople.isEmpty { Section("People") { ForEach(matchingPeople) { Label($0.displayName, systemImage: "person") } } }
                         if !matchingAssets.isEmpty { Section("Assets") { ForEach(matchingAssets) { Label($0.name, systemImage: "square.3.layers.3d") } } }
                         if !matchingLogs.isEmpty { Section("Log") { ForEach(matchingLogs) { Label($0.text, systemImage: "book.closed") } } }
+                        if !matchingEvents.isEmpty { Section("Calendar") { ForEach(matchingEvents) { event in Label("\(event.title) · \(event.startAt.formatted(date: .abbreviated, time: .shortened))", systemImage: "calendar") } } }
                     }
                     .scrollContentBackground(.hidden)
-                    .overlay { if matchingActions.isEmpty && matchingPeople.isEmpty && matchingAssets.isEmpty && matchingLogs.isEmpty { ContentUnavailableView.search(text: query) } }
+                    .overlay { if matchingActions.isEmpty && matchingPeople.isEmpty && matchingAssets.isEmpty && matchingLogs.isEmpty && matchingEvents.isEmpty { ContentUnavailableView.search(text: query) } }
                 }
             }
             .navigationTitle("SEARCH")

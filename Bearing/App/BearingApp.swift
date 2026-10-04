@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct BearingApp: App {
     private let container: ModelContainer
+    @StateObject private var voice = VoiceEngine()
 
     init() {
         do {
@@ -18,9 +19,9 @@ struct BearingApp: App {
         WindowGroup {
             AppRootView()
                 .tint(BearingTheme.olive)
+                .environmentObject(voice)
                 .task { DemoContent.seedIfNeeded(in: container.mainContext) }
         }
         .modelContainer(container)
     }
 }
-

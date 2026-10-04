@@ -13,10 +13,12 @@ private func previewContainer() -> ModelContainer {
 #Preview("Bearing — iPhone") {
     AppRootView()
         .modelContainer(previewContainer())
+        .environmentObject(VoiceEngine())
 }
 
 #Preview("Universal Capture") {
     CaptureView()
         .modelContainer(previewContainer())
+        .environmentObject(VoiceEngine())
 }
 #endif

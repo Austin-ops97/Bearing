@@ -6,6 +6,7 @@ enum BearingSchema {
         BearingAction.self,
         BearingPerson.self,
         BearingAsset.self,
+        BearingCalendarEvent.self,
         BearingLogEntry.self,
         BearingRoutine.self,
         BearingRoutineItem.self
@@ -40,6 +41,16 @@ enum ActionStatus: String, Codable, CaseIterable, Identifiable {
     var label: String { rawValue.uppercased() }
 }
 
+enum TimingClassification: String, Codable, CaseIterable, Identifiable {
+    case fixed
+    case deadline
+    case flexible
+    case someday
+
+    var id: String { rawValue }
+    var label: String { rawValue.uppercased() }
+}
+
 enum AssetStatus: String, Codable, CaseIterable {
     case normal
     case attention
@@ -64,6 +75,10 @@ final class BearingAction {
     var priorityRaw: Int
     var statusRaw: String
     var dueAt: Date?
+    var preferredAt: Date?
+    var estimatedDurationMinutes: Int?
+    var actualDurationMinutes: Int?
+    var timingRaw: String
     var followUpAt: Date?
     var waitingSince: Date?
     var createdAt: Date
@@ -84,6 +99,11 @@ final class BearingAction {
         set { statusRaw = newValue.rawValue }
     }
 
+    var timing: TimingClassification {
+        get { TimingClassification(rawValue: timingRaw) ?? .flexible }
+        set { timingRaw = newValue.rawValue }
+    }
+
     init(
         id: UUID = UUID(),
         title: String,
@@ -91,6 +111,10 @@ final class BearingAction {
         priority: ActionPriority = .planned,
         status: ActionStatus = .open,
         dueAt: Date? = nil,
+        preferredAt: Date? = nil,
+        estimatedDurationMinutes: Int? = nil,
+        actualDurationMinutes: Int? = nil,
+        timing: TimingClassification = .flexible,
         followUpAt: Date? = nil,
         waitingSince: Date? = nil,
         source: String? = nil,
@@ -105,6 +129,10 @@ final class BearingAction {
         self.priorityRaw = priority.rawValue
         self.statusRaw = status.rawValue
         self.dueAt = dueAt
+        self.preferredAt = preferredAt
+        self.estimatedDurationMinutes = estimatedDurationMinutes
+        self.actualDurationMinutes = actualDurationMinutes
+        self.timingRaw = timing.rawValue
         self.followUpAt = followUpAt
         self.waitingSince = waitingSince
         self.createdAt = createdAt
@@ -127,6 +155,70 @@ final class BearingAction {
         waitingSince = date
         status = .waiting
         modifiedAt = date
+    }
+}
+
+enum CalendarEventSource: String, Codable, CaseIterable {
+    case bearing
+    case appleCalendar
+    case microsoftGraph
+
+    var label: String {
+        switch self {
+        case .bearing: "BEARING"
+        case .appleCalendar: "APPLE CALENDAR"
+        case .microsoftGraph: "MICROSOFT 365"
+        }
+    }
+}
+
+@Model
+final class BearingCalendarEvent {
+    var id: UUID
+    var title: String
+    var startAt: Date
+    var endAt: Date
+    var preparationMinutes: Int
+    var transitionMinutes: Int
+    var sourceRaw: String
+    var externalID: String?
+    var location: String?
+    var notes: String
+
+    var source: CalendarEventSource {
+        get { CalendarEventSource(rawValue: sourceRaw) ?? .bearing }
+        set { sourceRaw = newValue.rawValue }
+    }
+
+    var occupiedInterval: DateInterval {
+        DateInterval(
+            start: startAt.addingTimeInterval(TimeInterval(-(preparationMinutes + transitionMinutes) * 60)),
+            end: endAt
+        )
+    }
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        startAt: Date,
+        endAt: Date,
+        preparationMinutes: Int = 0,
+        transitionMinutes: Int = 0,
+        source: CalendarEventSource = .bearing,
+        externalID: String? = nil,
+        location: String? = nil,
+        notes: String = ""
+    ) {
+        self.id = id
+        self.title = title
+        self.startAt = startAt
+        self.endAt = endAt
+        self.preparationMinutes = preparationMinutes
+        self.transitionMinutes = transitionMinutes
+        self.sourceRaw = source.rawValue
+        self.externalID = externalID
+        self.location = location
+        self.notes = notes
     }
 }
 
@@ -300,4 +392,3 @@ final class BearingRoutineItem {
         self.completedAt = completedAt
     }
 }
-
