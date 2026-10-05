@@ -1,20 +1,40 @@
-name: Bearing
+name: Cailyn
 options:
   bundleIdPrefix: com.austinops97
   deploymentTarget:
     iOS: "18.0"
   createIntermediateGroups: true
+packages:
+  mlx-swift-lm:
+    url: https://github.com/ml-explore/mlx-swift-lm
+    from: 3.32.3
+  swift-huggingface:
+    url: https://github.com/huggingface/swift-huggingface
+    from: 0.13.0
+  swift-transformers:
+    url: https://github.com/huggingface/swift-transformers
+    from: 1.3.4
+  microsoft-authentication-library-for-objc:
+    url: https://github.com/AzureAD/microsoft-authentication-library-for-objc
+    exactVersion: 2.16.0
 settings:
   base:
     SWIFT_VERSION: 6.0
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: 7C836UV5SR
     CODE_SIGN_STYLE: Automatic
     CURRENT_PROJECT_VERSION: 1
     MARKETING_VERSION: 0.1.0
     GENERATE_INFOPLIST_FILE: YES
-    INFOPLIST_KEY_CFBundleDisplayName: Bearing
+    INFOPLIST_KEY_CFBundleDisplayName: Cailyn
     INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
-    INFOPLIST_KEY_NSFaceIDUsageDescription: Bearing can use Face ID to protect your private operational information.
+    INFOPLIST_KEY_NSFaceIDUsageDescription: Cailyn can use Face ID to protect your private operational information.
+    INFOPLIST_KEY_NSMicrophoneUsageDescription: Cailyn uses the microphone only while you are capturing a note. Audio is not saved.
+    INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: Cailyn transcribes your voice on device so you can review captured actions and shift notes.
+    INFOPLIST_KEY_NSAlarmKitUsageDescription: Cailyn schedules only the prominent alarms that you review and approve.
+    INFOPLIST_KEY_NSPersonalVoiceUsageDescription: Cailyn can use a Personal Voice only when you explicitly authorize it for spoken awareness.
+    INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: Cailyn creates and updates events in a dedicated Cailyn calendar after you approve them.
+    INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription: Cailyn adds approved events to a dedicated Cailyn calendar.
+    INFOPLIST_FILE: Cailyn/Info.plist
     INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
@@ -23,26 +43,46 @@ settings:
     SUPPORTS_MACCATALYST: NO
     TARGETED_DEVICE_FAMILY: "1,2"
 targets:
-  Bearing:
+  Cailyn:
     type: application
     platform: iOS
     sources:
-      - path: Bearing
+      - path: Cailyn
     resources:
-      - path: Bearing/Resources
+      - path: Cailyn/Resources
+    info:
+      path: Cailyn/Info.plist
+      properties:
+        CFBundleURLTypes:
+          - CFBundleURLName: com.austinops97.Cailyn
+            CFBundleURLSchemes:
+              - msauth.com.austinops97.Cailyn
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.Bearing
+        PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.Cailyn
+    dependencies:
+      - package: mlx-swift-lm
+        product: MLXLLM
+      - package: mlx-swift-lm
+        product: MLXLMCommon
+      - package: mlx-swift-lm
+        product: MLXHuggingFace
+      - package: swift-huggingface
+        product: HuggingFace
+      - package: swift-transformers
+        product: Tokenizers
+      - package: microsoft-authentication-library-for-objc
+        product: MSAL
     scheme:
       testTargets:
-        - BearingTests
-  BearingTests:
+        - CailynTests
+  CailynTests:
     type: bundle.unit-test
     platform: iOS
     sources:
-      - path: BearingTests
+      - path: CailynTests
     dependencies:
-      - target: Bearing
+      - target: Cailyn
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.BearingTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.CailynTests

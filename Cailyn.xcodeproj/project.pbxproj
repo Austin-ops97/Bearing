@@ -1,0 +1,903 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0278D4C988E06AA8BFAA15A9 /* CailynAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FF9E9EB5EAAEE5AAB34467 /* CailynAssistantView.swift */; };
+		06B3D9B70F13D6A286C808E4 /* HybridIntelligenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40C3E3CAC0510429B67B2DC /* HybridIntelligenceService.swift */; };
+		0EC75C614AFE921FF9212C16 /* CailynLocalModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D531CCFE842ED364D901B97 /* CailynLocalModelManager.swift */; };
+		1097B983F19E0CEE9200A72C /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = 27B8D86200291504D9AADFE5 /* HuggingFace */; };
+		1336A7808D5CE152F789FED5 /* EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78B13DBB2BEE88C64C81506 /* EventsView.swift */; };
+		13F4DB161D2A8BEA91070D8C /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = CAE5996CDFE4CA57E25CA8D8 /* Tokenizers */; };
+		17D409BFF90C83254CDEF341 /* IntelligenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583B8B5A02996E16298E575C /* IntelligenceService.swift */; };
+		186F3CCCDB469AB6B06390F1 /* CailynTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837A5FF5F3BC9D8CBEC0C5C5 /* CailynTheme.swift */; };
+		1BF767CFB32AE5A56AB1DAF7 /* WorkShift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8396826F3E560B2B0C058A67 /* WorkShift.swift */; };
+		1CC530253F493BEB66241732 /* MLXHuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = F6F441613FAC9E35E513AC48 /* MLXHuggingFace */; };
+		1D5F2EBFB7FFCFEA377A85F1 /* LocalRuleIntelligenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CB9364EABECB44CCD854BA /* LocalRuleIntelligenceTests.swift */; };
+		2ED182BAEEA8ED6E12960601 /* ActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD555DC43CACA0E9C5852042 /* ActionsView.swift */; };
+		3148289FBA1B1262375186A7 /* VoiceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE52A178C22D517379183A9 /* VoiceEngine.swift */; };
+		346AE45062291641218D0A1D /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641FF719714049D46E02EF26 /* RoutinesView.swift */; };
+		450F3C35358CAD17860827EE /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = 7C3A6EE9447619FF385AB39D /* MSAL */; };
+		4B134A435017E1A4AAA80365 /* PlanningEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5BFADFE21EFC0CB65F746D9 /* PlanningEngineTests.swift */; };
+		4B639BC3E31CD372A3352F99 /* SpeechCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B38EF2465C3BEE0C9DD5E7 /* SpeechCaptureController.swift */; };
+		4C8D9D9E5AC2901D293F6DA2 /* CaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00DD64D0608E0EEF4A22A6DE /* CaptureView.swift */; };
+		4D64F686F83333350D79E1B2 /* ShiftScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D045926D09AC3CBC174C20C /* ShiftScheduleView.swift */; };
+		507D649BE42D9EDD875870C7 /* ShiftScheduleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C612AAB7287A387F1FD568 /* ShiftScheduleTests.swift */; };
+		5DDF12EBE03A2506E4841E84 /* PlanningEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8613C6409D14B4016340E723 /* PlanningEngine.swift */; };
+		632C5C64E5DCF28F318E44D7 /* AppleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1DF7A7E3D4F2C87C592052 /* AppleCalendarService.swift */; };
+		65EE284CFA3C3801AB2BF22B /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 9E2EE5F05FE60D3BCB9DD7B1 /* MLXLLM */; };
+		6D031F4231C941E28A00CFFA /* SitrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE73A962D178DF9C49D5666 /* SitrepView.swift */; };
+		6D4BE074755E982863FE174F /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6958C42049E1757E18FA0918 /* LogView.swift */; };
+		76EE3C455738FC428A9AECE2 /* CailynApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033DC24AF9DCFB97C830FA63 /* CailynApp.swift */; };
+		807DDDC9C4EF440146920DC9 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 815976A83B157655AD47295C /* MLXLMCommon */; };
+		80CFE66D4D78882EF2B63DE9 /* PeopleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D336F0073D6A5DE138EF1 /* PeopleView.swift */; };
+		82687F98BFD8FB970FFC49C2 /* AlertSchedulingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB8D92792BB095923964A9A8 /* AlertSchedulingService.swift */; };
+		8AC3000147DB6AC95F773096 /* TurnoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DCB7FD8AA0784BED4BC9EAC /* TurnoverView.swift */; };
+		9FF2E72BF69567AF9C923244 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DAF1C7B06136EAFDE8785A /* PlanView.swift */; };
+		A1271BE804B02E5907C0EAB6 /* AttentionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE82FA12CC09DB4FBEA67D9 /* AttentionEngineTests.swift */; };
+		B5EA492E6D01933E63C717F6 /* Microsoft365View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC686187126E7812968C039 /* Microsoft365View.swift */; };
+		CA9DC74BC4F80FCCE2C5F03E /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F99D305058FD94435CAA13 /* AppRootView.swift */; };
+		D0D1F7FB3A364CE8A87F9E22 /* KnowledgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48C6731FFFD3F2D423AB95B3 /* KnowledgeView.swift */; };
+		D34155196914F622D2F8E619 /* PreviewSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8437E3863FE30EDB234B70 /* PreviewSupport.swift */; };
+		D373577095075DCD7A28DC35 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = E848264A98422DA2C48A7834 /* Models.swift */; };
+		DDF234ED54CE99A61394C580 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A14639B1DFEA2F8DF5E71DB /* Assets.xcassets */; };
+		E16BF922444DF51FA599B621 /* CailynSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 218B2EDA880C7766B7F358C2 /* CailynSearchView.swift */; };
+		E266B51343F9D89F261CAE4C /* TemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60788DC65C47B457EC1B210A /* TemplatesView.swift */; };
+		E9E443721BF49CE7B9E9F503 /* DemoContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7ECBCEEBDE85CFF340D8EB /* DemoContent.swift */; };
+		EB042EAA44ED36E4CB100671 /* OpsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D68DB6138314B152D01D9F /* OpsView.swift */; };
+		F0E6D6F3C46ACBBBEBB4C7DF /* AttentionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C14125A7106D028A6FD0BE /* AttentionEngine.swift */; };
+		F32F783749F088DADD448DE8 /* VoiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914F5EC6B01AE0FD42798912 /* VoiceSettingsView.swift */; };
+		F4B00EA93DED9AB4F1E83A8A /* MicrosoftGraphService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79E53CA0B0767BF28EB1327 /* MicrosoftGraphService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		91C1977BD45EEF45D210085E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C6832EBEAA8FFB343C8CB7F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8A5BA1EE2D43AA39434E2486;
+			remoteInfo = Cailyn;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		00DD64D0608E0EEF4A22A6DE /* CaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureView.swift; sourceTree = "<group>"; };
+		033DC24AF9DCFB97C830FA63 /* CailynApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynApp.swift; sourceTree = "<group>"; };
+		0E1DF7A7E3D4F2C87C592052 /* AppleCalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleCalendarService.swift; sourceTree = "<group>"; };
+		1A1152C9F7DE08274DC56FDB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		218B2EDA880C7766B7F358C2 /* CailynSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynSearchView.swift; sourceTree = "<group>"; };
+		2D531CCFE842ED364D901B97 /* CailynLocalModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynLocalModelManager.swift; sourceTree = "<group>"; };
+		30DAF1C7B06136EAFDE8785A /* PlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
+		48C6731FFFD3F2D423AB95B3 /* KnowledgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeView.swift; sourceTree = "<group>"; };
+		4DE82FA12CC09DB4FBEA67D9 /* AttentionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttentionEngineTests.swift; sourceTree = "<group>"; };
+		50F99D305058FD94435CAA13 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		583B8B5A02996E16298E575C /* IntelligenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntelligenceService.swift; sourceTree = "<group>"; };
+		5BCBCDC23E450F5DC097375C /* Cailyn.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Cailyn.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		60788DC65C47B457EC1B210A /* TemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatesView.swift; sourceTree = "<group>"; };
+		63C612AAB7287A387F1FD568 /* ShiftScheduleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftScheduleTests.swift; sourceTree = "<group>"; };
+		641FF719714049D46E02EF26 /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
+		68CB9364EABECB44CCD854BA /* LocalRuleIntelligenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalRuleIntelligenceTests.swift; sourceTree = "<group>"; };
+		6958C42049E1757E18FA0918 /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+		6DE73A962D178DF9C49D5666 /* SitrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitrepView.swift; sourceTree = "<group>"; };
+		7A14639B1DFEA2F8DF5E71DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		837A5FF5F3BC9D8CBEC0C5C5 /* CailynTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynTheme.swift; sourceTree = "<group>"; };
+		8396826F3E560B2B0C058A67 /* WorkShift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkShift.swift; sourceTree = "<group>"; };
+		8613C6409D14B4016340E723 /* PlanningEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningEngine.swift; sourceTree = "<group>"; };
+		8BE52A178C22D517379183A9 /* VoiceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceEngine.swift; sourceTree = "<group>"; };
+		914F5EC6B01AE0FD42798912 /* VoiceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSettingsView.swift; sourceTree = "<group>"; };
+		9D045926D09AC3CBC174C20C /* ShiftScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftScheduleView.swift; sourceTree = "<group>"; };
+		9DCB7FD8AA0784BED4BC9EAC /* TurnoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnoverView.swift; sourceTree = "<group>"; };
+		9EC686187126E7812968C039 /* Microsoft365View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Microsoft365View.swift; sourceTree = "<group>"; };
+		B79E53CA0B0767BF28EB1327 /* MicrosoftGraphService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrosoftGraphService.swift; sourceTree = "<group>"; };
+		B7D68DB6138314B152D01D9F /* OpsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpsView.swift; sourceTree = "<group>"; };
+		BB8D92792BB095923964A9A8 /* AlertSchedulingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSchedulingService.swift; sourceTree = "<group>"; };
+		BF0A82A1851CDD98D95D2168 /* CailynTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CailynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD555DC43CACA0E9C5852042 /* ActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsView.swift; sourceTree = "<group>"; };
+		D2FF9E9EB5EAAEE5AAB34467 /* CailynAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynAssistantView.swift; sourceTree = "<group>"; };
+		D5BFADFE21EFC0CB65F746D9 /* PlanningEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningEngineTests.swift; sourceTree = "<group>"; };
+		E02D336F0073D6A5DE138EF1 /* PeopleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleView.swift; sourceTree = "<group>"; };
+		E1C14125A7106D028A6FD0BE /* AttentionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttentionEngine.swift; sourceTree = "<group>"; };
+		E40C3E3CAC0510429B67B2DC /* HybridIntelligenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HybridIntelligenceService.swift; sourceTree = "<group>"; };
+		E848264A98422DA2C48A7834 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		E8B38EF2465C3BEE0C9DD5E7 /* SpeechCaptureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechCaptureController.swift; sourceTree = "<group>"; };
+		F78B13DBB2BEE88C64C81506 /* EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsView.swift; sourceTree = "<group>"; };
+		FA8437E3863FE30EDB234B70 /* PreviewSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSupport.swift; sourceTree = "<group>"; };
+		FE7ECBCEEBDE85CFF340D8EB /* DemoContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoContent.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		45840819959CC7EBB734C207 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65EE284CFA3C3801AB2BF22B /* MLXLLM in Frameworks */,
+				807DDDC9C4EF440146920DC9 /* MLXLMCommon in Frameworks */,
+				1CC530253F493BEB66241732 /* MLXHuggingFace in Frameworks */,
+				1097B983F19E0CEE9200A72C /* HuggingFace in Frameworks */,
+				13F4DB161D2A8BEA91070D8C /* Tokenizers in Frameworks */,
+				450F3C35358CAD17860827EE /* MSAL in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0008CEEE6975A3B7F6BC7D4A /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				218B2EDA880C7766B7F358C2 /* CailynSearchView.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
+		00F9BD6B49C8B01C366A68FE /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				BB8D92792BB095923964A9A8 /* AlertSchedulingService.swift */,
+				E8B38EF2465C3BEE0C9DD5E7 /* SpeechCaptureController.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+		016E7ED682BC031C6F9FC05B /* App */ = {
+			isa = PBXGroup;
+			children = (
+				50F99D305058FD94435CAA13 /* AppRootView.swift */,
+				033DC24AF9DCFB97C830FA63 /* CailynApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		080C2EE08656EDC758F18EA1 = {
+			isa = PBXGroup;
+			children = (
+				53923F207511095162006C9E /* Cailyn */,
+				7C3E5B4F0894CD35E824FAEE /* CailynTests */,
+				567E48FAD17808737B4E2A18 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0D8DA2E4E20E315F7AE29F15 /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				0E1DF7A7E3D4F2C87C592052 /* AppleCalendarService.swift */,
+				B79E53CA0B0767BF28EB1327 /* MicrosoftGraphService.swift */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
+		18201300587DC8E3337C6134 /* People */ = {
+			isa = PBXGroup;
+			children = (
+				E02D336F0073D6A5DE138EF1 /* PeopleView.swift */,
+			);
+			path = People;
+			sourceTree = "<group>";
+		};
+		1E9E3CCAEFAC388CC8738D98 /* Voice */ = {
+			isa = PBXGroup;
+			children = (
+				8BE52A178C22D517379183A9 /* VoiceEngine.swift */,
+			);
+			path = Voice;
+			sourceTree = "<group>";
+		};
+		21FFBF9ADD3328434AC56C02 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				60788DC65C47B457EC1B210A /* TemplatesView.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		30F688103DE6A660025C40DA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7A14639B1DFEA2F8DF5E71DB /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		335E68D4CCE7FD608A432F30 /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				FA8437E3863FE30EDB234B70 /* PreviewSupport.swift */,
+			);
+			path = Preview;
+			sourceTree = "<group>";
+		};
+		500DBB0C42B09199E20050DF /* Log */ = {
+			isa = PBXGroup;
+			children = (
+				6958C42049E1757E18FA0918 /* LogView.swift */,
+			);
+			path = Log;
+			sourceTree = "<group>";
+		};
+		53923F207511095162006C9E /* Cailyn */ = {
+			isa = PBXGroup;
+			children = (
+				1A1152C9F7DE08274DC56FDB /* Info.plist */,
+				016E7ED682BC031C6F9FC05B /* App */,
+				00F9BD6B49C8B01C366A68FE /* Capture */,
+				A7571ECD7D0602F11142ABE6 /* Design */,
+				68178D55BAD72B46F3F932C6 /* Domain */,
+				853D3EEE5F6A9FE2AF1D9749 /* Features */,
+				0D8DA2E4E20E315F7AE29F15 /* Integrations */,
+				ADC6568701F326F31B53C96C /* Intelligence */,
+				927BD40D92A16B6AE6159D73 /* Persistence */,
+				335E68D4CCE7FD608A432F30 /* Preview */,
+				30F688103DE6A660025C40DA /* Resources */,
+				1E9E3CCAEFAC388CC8738D98 /* Voice */,
+			);
+			path = Cailyn;
+			sourceTree = "<group>";
+		};
+		567E48FAD17808737B4E2A18 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5BCBCDC23E450F5DC097375C /* Cailyn.app */,
+				BF0A82A1851CDD98D95D2168 /* CailynTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		68178D55BAD72B46F3F932C6 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				E1C14125A7106D028A6FD0BE /* AttentionEngine.swift */,
+				E848264A98422DA2C48A7834 /* Models.swift */,
+				8613C6409D14B4016340E723 /* PlanningEngine.swift */,
+				8396826F3E560B2B0C058A67 /* WorkShift.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		7C3E5B4F0894CD35E824FAEE /* CailynTests */ = {
+			isa = PBXGroup;
+			children = (
+				4DE82FA12CC09DB4FBEA67D9 /* AttentionEngineTests.swift */,
+				68CB9364EABECB44CCD854BA /* LocalRuleIntelligenceTests.swift */,
+				D5BFADFE21EFC0CB65F746D9 /* PlanningEngineTests.swift */,
+				63C612AAB7287A387F1FD568 /* ShiftScheduleTests.swift */,
+			);
+			path = CailynTests;
+			sourceTree = "<group>";
+		};
+		853D3EEE5F6A9FE2AF1D9749 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				EAF46644CE7009C83EFBF4E8 /* Actions */,
+				B947136E96D5570FD5EAB983 /* Assistant */,
+				A31B54B5A7EBE41FF76A6D25 /* Capture */,
+				B76C5739C1BA6AAA7CAB4C93 /* Events */,
+				EAC175587E2DE320CFFD729B /* Knowledge */,
+				500DBB0C42B09199E20050DF /* Log */,
+				CB24DBD64169D6B3D37A8972 /* Ops */,
+				18201300587DC8E3337C6134 /* People */,
+				8584B45271AD1AC849389FF7 /* Plan */,
+				F84C6C225E686EDE289548DD /* Routines */,
+				0008CEEE6975A3B7F6BC7D4A /* Search */,
+				F8539708885F33B220BAAC17 /* Settings */,
+				F4B35E9F0EF610AA9911632C /* Sitrep */,
+				21FFBF9ADD3328434AC56C02 /* Templates */,
+				E248F95046E40E07FFB4A4FC /* Turnover */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		8584B45271AD1AC849389FF7 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				30DAF1C7B06136EAFDE8785A /* PlanView.swift */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		927BD40D92A16B6AE6159D73 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				FE7ECBCEEBDE85CFF340D8EB /* DemoContent.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		A31B54B5A7EBE41FF76A6D25 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				00DD64D0608E0EEF4A22A6DE /* CaptureView.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+		A7571ECD7D0602F11142ABE6 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				837A5FF5F3BC9D8CBEC0C5C5 /* CailynTheme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		ADC6568701F326F31B53C96C /* Intelligence */ = {
+			isa = PBXGroup;
+			children = (
+				2D531CCFE842ED364D901B97 /* CailynLocalModelManager.swift */,
+				E40C3E3CAC0510429B67B2DC /* HybridIntelligenceService.swift */,
+				583B8B5A02996E16298E575C /* IntelligenceService.swift */,
+			);
+			path = Intelligence;
+			sourceTree = "<group>";
+		};
+		B76C5739C1BA6AAA7CAB4C93 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				F78B13DBB2BEE88C64C81506 /* EventsView.swift */,
+			);
+			path = Events;
+			sourceTree = "<group>";
+		};
+		B947136E96D5570FD5EAB983 /* Assistant */ = {
+			isa = PBXGroup;
+			children = (
+				D2FF9E9EB5EAAEE5AAB34467 /* CailynAssistantView.swift */,
+			);
+			path = Assistant;
+			sourceTree = "<group>";
+		};
+		CB24DBD64169D6B3D37A8972 /* Ops */ = {
+			isa = PBXGroup;
+			children = (
+				B7D68DB6138314B152D01D9F /* OpsView.swift */,
+			);
+			path = Ops;
+			sourceTree = "<group>";
+		};
+		E248F95046E40E07FFB4A4FC /* Turnover */ = {
+			isa = PBXGroup;
+			children = (
+				9DCB7FD8AA0784BED4BC9EAC /* TurnoverView.swift */,
+			);
+			path = Turnover;
+			sourceTree = "<group>";
+		};
+		EAC175587E2DE320CFFD729B /* Knowledge */ = {
+			isa = PBXGroup;
+			children = (
+				48C6731FFFD3F2D423AB95B3 /* KnowledgeView.swift */,
+			);
+			path = Knowledge;
+			sourceTree = "<group>";
+		};
+		EAF46644CE7009C83EFBF4E8 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				CD555DC43CACA0E9C5852042 /* ActionsView.swift */,
+			);
+			path = Actions;
+			sourceTree = "<group>";
+		};
+		F4B35E9F0EF610AA9911632C /* Sitrep */ = {
+			isa = PBXGroup;
+			children = (
+				6DE73A962D178DF9C49D5666 /* SitrepView.swift */,
+			);
+			path = Sitrep;
+			sourceTree = "<group>";
+		};
+		F84C6C225E686EDE289548DD /* Routines */ = {
+			isa = PBXGroup;
+			children = (
+				641FF719714049D46E02EF26 /* RoutinesView.swift */,
+			);
+			path = Routines;
+			sourceTree = "<group>";
+		};
+		F8539708885F33B220BAAC17 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				9EC686187126E7812968C039 /* Microsoft365View.swift */,
+				9D045926D09AC3CBC174C20C /* ShiftScheduleView.swift */,
+				914F5EC6B01AE0FD42798912 /* VoiceSettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8A5BA1EE2D43AA39434E2486 /* Cailyn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 456F82370BFA0F1878AAD623 /* Build configuration list for PBXNativeTarget "Cailyn" */;
+			buildPhases = (
+				1DC897475028DCCCBD9166B5 /* Sources */,
+				F21EE0A381E13A9E9C0D4A2A /* Resources */,
+				45840819959CC7EBB734C207 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Cailyn;
+			packageProductDependencies = (
+				9E2EE5F05FE60D3BCB9DD7B1 /* MLXLLM */,
+				815976A83B157655AD47295C /* MLXLMCommon */,
+				F6F441613FAC9E35E513AC48 /* MLXHuggingFace */,
+				27B8D86200291504D9AADFE5 /* HuggingFace */,
+				CAE5996CDFE4CA57E25CA8D8 /* Tokenizers */,
+				7C3A6EE9447619FF385AB39D /* MSAL */,
+			);
+			productName = Cailyn;
+			productReference = 5BCBCDC23E450F5DC097375C /* Cailyn.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BE56DAD3AE8B79D9C9882A22 /* CailynTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE182E79D278561CDA12ECFA /* Build configuration list for PBXNativeTarget "CailynTests" */;
+			buildPhases = (
+				8EC7A59A4728B48DC072C557 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				740BECB6202F0340D3DAC56C /* PBXTargetDependency */,
+			);
+			name = CailynTests;
+			packageProductDependencies = (
+			);
+			productName = CailynTests;
+			productReference = BF0A82A1851CDD98D95D2168 /* CailynTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7C6832EBEAA8FFB343C8CB7F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					8A5BA1EE2D43AA39434E2486 = {
+						DevelopmentTeam = 7C836UV5SR;
+						ProvisioningStyle = Automatic;
+					};
+					BE56DAD3AE8B79D9C9882A22 = {
+						DevelopmentTeam = 7C836UV5SR;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 46E3159F0401AC96CF7BE248 /* Build configuration list for PBXProject "Cailyn" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 080C2EE08656EDC758F18EA1;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6D653EB8F98CC0838E0AA514 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */,
+				BDEF4993604D44958ECC43D2 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
+				4BE758E70238888D4FD40E18 /* XCRemoteSwiftPackageReference "swift-huggingface" */,
+				371375A00AB51EDF270251BA /* XCRemoteSwiftPackageReference "swift-transformers" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 567E48FAD17808737B4E2A18 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8A5BA1EE2D43AA39434E2486 /* Cailyn */,
+				BE56DAD3AE8B79D9C9882A22 /* CailynTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F21EE0A381E13A9E9C0D4A2A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDF234ED54CE99A61394C580 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1DC897475028DCCCBD9166B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2ED182BAEEA8ED6E12960601 /* ActionsView.swift in Sources */,
+				82687F98BFD8FB970FFC49C2 /* AlertSchedulingService.swift in Sources */,
+				CA9DC74BC4F80FCCE2C5F03E /* AppRootView.swift in Sources */,
+				632C5C64E5DCF28F318E44D7 /* AppleCalendarService.swift in Sources */,
+				F0E6D6F3C46ACBBBEBB4C7DF /* AttentionEngine.swift in Sources */,
+				76EE3C455738FC428A9AECE2 /* CailynApp.swift in Sources */,
+				0278D4C988E06AA8BFAA15A9 /* CailynAssistantView.swift in Sources */,
+				0EC75C614AFE921FF9212C16 /* CailynLocalModelManager.swift in Sources */,
+				E16BF922444DF51FA599B621 /* CailynSearchView.swift in Sources */,
+				186F3CCCDB469AB6B06390F1 /* CailynTheme.swift in Sources */,
+				4C8D9D9E5AC2901D293F6DA2 /* CaptureView.swift in Sources */,
+				E9E443721BF49CE7B9E9F503 /* DemoContent.swift in Sources */,
+				1336A7808D5CE152F789FED5 /* EventsView.swift in Sources */,
+				06B3D9B70F13D6A286C808E4 /* HybridIntelligenceService.swift in Sources */,
+				17D409BFF90C83254CDEF341 /* IntelligenceService.swift in Sources */,
+				D0D1F7FB3A364CE8A87F9E22 /* KnowledgeView.swift in Sources */,
+				6D4BE074755E982863FE174F /* LogView.swift in Sources */,
+				B5EA492E6D01933E63C717F6 /* Microsoft365View.swift in Sources */,
+				F4B00EA93DED9AB4F1E83A8A /* MicrosoftGraphService.swift in Sources */,
+				D373577095075DCD7A28DC35 /* Models.swift in Sources */,
+				EB042EAA44ED36E4CB100671 /* OpsView.swift in Sources */,
+				80CFE66D4D78882EF2B63DE9 /* PeopleView.swift in Sources */,
+				9FF2E72BF69567AF9C923244 /* PlanView.swift in Sources */,
+				5DDF12EBE03A2506E4841E84 /* PlanningEngine.swift in Sources */,
+				D34155196914F622D2F8E619 /* PreviewSupport.swift in Sources */,
+				346AE45062291641218D0A1D /* RoutinesView.swift in Sources */,
+				4D64F686F83333350D79E1B2 /* ShiftScheduleView.swift in Sources */,
+				6D031F4231C941E28A00CFFA /* SitrepView.swift in Sources */,
+				4B639BC3E31CD372A3352F99 /* SpeechCaptureController.swift in Sources */,
+				E266B51343F9D89F261CAE4C /* TemplatesView.swift in Sources */,
+				8AC3000147DB6AC95F773096 /* TurnoverView.swift in Sources */,
+				3148289FBA1B1262375186A7 /* VoiceEngine.swift in Sources */,
+				F32F783749F088DADD448DE8 /* VoiceSettingsView.swift in Sources */,
+				1BF767CFB32AE5A56AB1DAF7 /* WorkShift.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8EC7A59A4728B48DC072C557 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1271BE804B02E5907C0EAB6 /* AttentionEngineTests.swift in Sources */,
+				1D5F2EBFB7FFCFEA377A85F1 /* LocalRuleIntelligenceTests.swift in Sources */,
+				4B134A435017E1A4AAA80365 /* PlanningEngineTests.swift in Sources */,
+				507D649BE42D9EDD875870C7 /* ShiftScheduleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		740BECB6202F0340D3DAC56C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8A5BA1EE2D43AA39434E2486 /* Cailyn */;
+			targetProxy = 91C1977BD45EEF45D210085E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1674BE8E571268CFE3F60B28 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7C836UV5SR;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Cailyn/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Cailyn;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSAlarmKitUsageDescription = "Cailyn schedules only the prominent alarms that you review and approve.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Cailyn creates and updates events in a dedicated Cailyn calendar after you approve them.";
+				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Cailyn adds approved events to a dedicated Cailyn calendar.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Cailyn can use Face ID to protect your private operational information.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cailyn uses the microphone only while you are capturing a note. Audio is not saved.";
+				INFOPLIST_KEY_NSPersonalVoiceUsageDescription = "Cailyn can use a Personal Voice only when you explicitly authorize it for spoken awareness.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Cailyn transcribes your voice on device so you can review captured actions and shift notes.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		33D5CE6BA8CFDB997ACD5383 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Cailyn/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.austinops97.Cailyn;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5F1B915AAEA65EC97A294BE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.austinops97.CailynTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cailyn.app/Cailyn";
+			};
+			name = Release;
+		};
+		6412FEE97798E30B8D98A2CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7C836UV5SR;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Cailyn/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Cailyn;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSAlarmKitUsageDescription = "Cailyn schedules only the prominent alarms that you review and approve.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Cailyn creates and updates events in a dedicated Cailyn calendar after you approve them.";
+				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Cailyn adds approved events to a dedicated Cailyn calendar.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Cailyn can use Face ID to protect your private operational information.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cailyn uses the microphone only while you are capturing a note. Audio is not saved.";
+				INFOPLIST_KEY_NSPersonalVoiceUsageDescription = "Cailyn can use a Personal Voice only when you explicitly authorize it for spoken awareness.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Cailyn transcribes your voice on device so you can review captured actions and shift notes.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AD9309A602745E09CCAEC398 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Cailyn/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.austinops97.Cailyn;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FB81CC8810934074767A3882 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.austinops97.CailynTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cailyn.app/Cailyn";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		456F82370BFA0F1878AAD623 /* Build configuration list for PBXNativeTarget "Cailyn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33D5CE6BA8CFDB997ACD5383 /* Debug */,
+				AD9309A602745E09CCAEC398 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		46E3159F0401AC96CF7BE248 /* Build configuration list for PBXProject "Cailyn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6412FEE97798E30B8D98A2CC /* Debug */,
+				1674BE8E571268CFE3F60B28 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BE182E79D278561CDA12ECFA /* Build configuration list for PBXNativeTarget "CailynTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB81CC8810934074767A3882 /* Debug */,
+				5F1B915AAEA65EC97A294BE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		371375A00AB51EDF270251BA /* XCRemoteSwiftPackageReference "swift-transformers" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-transformers";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.4;
+			};
+		};
+		4BE758E70238888D4FD40E18 /* XCRemoteSwiftPackageReference "swift-huggingface" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-huggingface";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.13.0;
+			};
+		};
+		6D653EB8F98CC0838E0AA514 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AzureAD/microsoft-authentication-library-for-objc";
+			requirement = {
+				kind = exactVersion;
+				version = 2.16.0;
+			};
+		};
+		BDEF4993604D44958ECC43D2 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.32.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		27B8D86200291504D9AADFE5 /* HuggingFace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4BE758E70238888D4FD40E18 /* XCRemoteSwiftPackageReference "swift-huggingface" */;
+			productName = HuggingFace;
+		};
+		7C3A6EE9447619FF385AB39D /* MSAL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D653EB8F98CC0838E0AA514 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
+			productName = MSAL;
+		};
+		815976A83B157655AD47295C /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDEF4993604D44958ECC43D2 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
+		};
+		9E2EE5F05FE60D3BCB9DD7B1 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDEF4993604D44958ECC43D2 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLLM;
+		};
+		CAE5996CDFE4CA57E25CA8D8 /* Tokenizers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 371375A00AB51EDF270251BA /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Tokenizers;
+		};
+		F6F441613FAC9E35E513AC48 /* MLXHuggingFace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDEF4993604D44958ECC43D2 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXHuggingFace;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 7C6832EBEAA8FFB343C8CB7F /* Project object */;
+}
