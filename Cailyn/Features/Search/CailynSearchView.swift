@@ -11,6 +11,8 @@ struct CailynSearchView: View {
     @Query private var turnovers: [CailynTurnoverNote]
     @Query private var templates: [CailynTemplate]
     @Query private var knowledgeItems: [CailynKnowledgeItem]
+    @Query private var knowledgeDocuments: [CailynKnowledgeDocument]
+    @Query private var knowledgeChunks: [CailynKnowledgeChunk]
     @State private var query = ""
     @FocusState private var focused: Bool
 
@@ -23,6 +25,14 @@ struct CailynSearchView: View {
     private var matchingTurnovers: [CailynTurnoverNote] { turnovers.filter { $0.title.lowercased().contains(normalized) || $0.rawTranscript.lowercased().contains(normalized) || $0.overview.lowercased().contains(normalized) || $0.openActions.lowercased().contains(normalized) } }
     private var matchingTemplates: [CailynTemplate] { templates.filter { $0.title.lowercased().contains(normalized) || $0.category.lowercased().contains(normalized) || $0.instructions.lowercased().contains(normalized) || $0.fieldLines.lowercased().contains(normalized) } }
     private var matchingKnowledge: [CailynKnowledgeItem] { knowledgeItems.filter { $0.title.lowercased().contains(normalized) || $0.body.lowercased().contains(normalized) || $0.source.lowercased().contains(normalized) } }
+    private var matchingKnowledgeDocuments: [CailynKnowledgeDocument] {
+        let matchingIDs = Set(knowledgeChunks.filter { $0.content.lowercased().contains(normalized) }.map(\.documentID))
+        return knowledgeDocuments.filter {
+            $0.title.lowercased().contains(normalized)
+                || $0.fileName.lowercased().contains(normalized)
+                || matchingIDs.contains($0.id)
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -40,9 +50,10 @@ struct CailynSearchView: View {
                         if !matchingTurnovers.isEmpty { Section("Shift Turnovers") { ForEach(matchingTurnovers) { note in NavigationLink { TurnoverDetailView(note: note) } label: { Label(note.title, systemImage: "arrow.left.arrow.right") } } } }
                         if !matchingTemplates.isEmpty { Section("Templates") { ForEach(matchingTemplates) { template in NavigationLink { TemplateDetailView(template: template) } label: { Label(template.title, systemImage: "rectangle.3.group") } } } }
                         if !matchingKnowledge.isEmpty { Section("Knowledge") { ForEach(matchingKnowledge) { item in NavigationLink { KnowledgeDetailView(item: item) } label: { Label(item.title, systemImage: "books.vertical") } } } }
+                        if !matchingKnowledgeDocuments.isEmpty { Section("Knowledge Documents") { ForEach(matchingKnowledgeDocuments) { document in NavigationLink { KnowledgeDocumentDetailView(document: document) } label: { Label(document.title, systemImage: "doc.text") } } } }
                     }
                     .scrollContentBackground(.hidden)
-                    .overlay { if matchingActions.isEmpty && matchingPeople.isEmpty && matchingAssets.isEmpty && matchingLogs.isEmpty && matchingEvents.isEmpty && matchingTurnovers.isEmpty && matchingTemplates.isEmpty && matchingKnowledge.isEmpty { ContentUnavailableView.search(text: query) } }
+                    .overlay { if matchingActions.isEmpty && matchingPeople.isEmpty && matchingAssets.isEmpty && matchingLogs.isEmpty && matchingEvents.isEmpty && matchingTurnovers.isEmpty && matchingTemplates.isEmpty && matchingKnowledge.isEmpty && matchingKnowledgeDocuments.isEmpty { ContentUnavailableView.search(text: query) } }
                 }
             }
             .navigationTitle("SEARCH")

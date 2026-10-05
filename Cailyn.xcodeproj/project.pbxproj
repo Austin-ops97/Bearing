@@ -13,6 +13,7 @@
 		1097B983F19E0CEE9200A72C /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = 27B8D86200291504D9AADFE5 /* HuggingFace */; };
 		1336A7808D5CE152F789FED5 /* EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78B13DBB2BEE88C64C81506 /* EventsView.swift */; };
 		13F4DB161D2A8BEA91070D8C /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = CAE5996CDFE4CA57E25CA8D8 /* Tokenizers */; };
+		172BE1E8C4AC527802C8FD62 /* KnowledgeDocumentIndexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B4BE94677356A27B78DED3 /* KnowledgeDocumentIndexer.swift */; };
 		17D409BFF90C83254CDEF341 /* IntelligenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583B8B5A02996E16298E575C /* IntelligenceService.swift */; };
 		186F3CCCDB469AB6B06390F1 /* CailynTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837A5FF5F3BC9D8CBEC0C5C5 /* CailynTheme.swift */; };
 		1BF767CFB32AE5A56AB1DAF7 /* WorkShift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8396826F3E560B2B0C058A67 /* WorkShift.swift */; };
@@ -91,6 +92,7 @@
 		8613C6409D14B4016340E723 /* PlanningEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningEngine.swift; sourceTree = "<group>"; };
 		8BE52A178C22D517379183A9 /* VoiceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceEngine.swift; sourceTree = "<group>"; };
 		914F5EC6B01AE0FD42798912 /* VoiceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSettingsView.swift; sourceTree = "<group>"; };
+		92B4BE94677356A27B78DED3 /* KnowledgeDocumentIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeDocumentIndexer.swift; sourceTree = "<group>"; };
 		9D045926D09AC3CBC174C20C /* ShiftScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShiftScheduleView.swift; sourceTree = "<group>"; };
 		9DCB7FD8AA0784BED4BC9EAC /* TurnoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnoverView.swift; sourceTree = "<group>"; };
 		9EC686187126E7812968C039 /* Microsoft365View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Microsoft365View.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				2D531CCFE842ED364D901B97 /* CailynLocalModelManager.swift */,
 				E40C3E3CAC0510429B67B2DC /* HybridIntelligenceService.swift */,
 				583B8B5A02996E16298E575C /* IntelligenceService.swift */,
+				92B4BE94677356A27B78DED3 /* KnowledgeDocumentIndexer.swift */,
 			);
 			path = Intelligence;
 			sourceTree = "<group>";
@@ -532,6 +535,7 @@
 				1336A7808D5CE152F789FED5 /* EventsView.swift in Sources */,
 				06B3D9B70F13D6A286C808E4 /* HybridIntelligenceService.swift in Sources */,
 				17D409BFF90C83254CDEF341 /* IntelligenceService.swift in Sources */,
+				172BE1E8C4AC527802C8FD62 /* KnowledgeDocumentIndexer.swift in Sources */,
 				D0D1F7FB3A364CE8A87F9E22 /* KnowledgeView.swift in Sources */,
 				6D4BE074755E982863FE174F /* LogView.swift in Sources */,
 				B5EA492E6D01933E63C717F6 /* Microsoft365View.swift in Sources */,

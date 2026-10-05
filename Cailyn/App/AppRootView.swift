@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum AppSection: String, CaseIterable, Identifiable {
-    case sitrep = "SITREP"
+    case overview = "OVERVIEW"
     case plan = "PLAN"
     case events = "EVENTS"
     case routines = "ROUTINES"
@@ -20,7 +20,7 @@ enum AppSection: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
-        case .sitrep: "scope"
+        case .overview: "circle.hexagongrid.fill"
         case .plan: "calendar"
         case .events: "calendar.badge.clock"
         case .routines: "checklist"
@@ -41,7 +41,7 @@ enum AppSection: String, CaseIterable, Identifiable {
 struct AppRootView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @AppStorage("appearance.mode") private var appearanceMode = AppAppearance.dark.rawValue
-    @State private var selection: AppSection = .sitrep
+    @State private var selection: AppSection = .overview
     @State private var navigationRoots = Dictionary(
         uniqueKeysWithValues: AppSection.allCases.map { ($0, UUID()) }
     )
@@ -64,7 +64,7 @@ struct AppRootView: View {
 
     private var iPhoneLayout: some View {
         TabView(selection: tabSelection) {
-            ForEach([AppSection.sitrep, .plan, .events, .routines, .more]) { section in
+            ForEach([AppSection.overview, .plan, .events, .routines, .more]) { section in
                 NavigationStack { destination(for: section) }
                     .id(navigationRoots[section])
                     .tag(section)
@@ -137,7 +137,7 @@ struct AppRootView: View {
     @ViewBuilder
     private func destination(for section: AppSection) -> some View {
         switch section {
-        case .sitrep: SitrepView(onSearch: { showsSearch = true })
+        case .overview: SitrepView(onSearch: { showsSearch = true })
         case .plan: PlanView()
         case .events: EventsView()
         case .routines: RoutinesView()

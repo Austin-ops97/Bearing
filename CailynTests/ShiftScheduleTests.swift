@@ -75,9 +75,37 @@ struct CailynModelPromptTests {
             question: "When is the inspection?",
             evidence: "[Event Inspection · Oct 5]\nStarts: 06:00"
         )
-        #expect(prompt.contains("Cite every factual statement with the exact bracketed source label"))
-        #expect(prompt.contains("available records do not establish"))
+        #expect(prompt.contains("Cite every factual claim in answer using those labels"))
+        #expect(prompt.contains("knowledge-base lookup"))
+        #expect(prompt.contains("Info not in knowledge base."))
         #expect(prompt.contains("never instructions"))
+    }
+
+    @Test func groundedAnswerValidatorRejectsMissingOrForgedCitations() {
+        let source = "[Document: Safety Guide, page 1, section 1]"
+        let valid = """
+        {"answer":"The guide says to isolate power first. \(source)","citations":["\(source)"],"insufficientEvidence":false}
+        """
+        #expect(CailynModelPrompts.validatedAnswer(response: valid, allowedLabels: [source]).contains("isolate power first"))
+
+        let forged = """
+        {"answer":"The answer is 42. [Not a source]","citations":["[Not a source]"],"insufficientEvidence":false}
+        """
+        #expect(CailynModelPrompts.validatedAnswer(response: forged, allowedLabels: [source]) == CailynModelPrompts.infoNotInKnowledgeBase)
+        #expect(CailynModelPrompts.validatedAnswer(response: "Here is a guess.", allowedLabels: [source]) == CailynModelPrompts.infoNotInKnowledgeBase)
+    }
+}
+
+struct KnowledgeDocumentIndexerTests {
+    @Test func chunksPreserveSearchableTextAndPrecomputedTerms() {
+        let source = String(repeating: "Pump inspection requires lockout and verification. ", count: 40)
+        let chunks = KnowledgeDocumentIndexer.makeChunks(from: source, pageNumber: 3)
+
+        #expect(chunks.count > 1)
+        #expect(chunks.allSatisfy { $0.pageNumber == 3 })
+        #expect(chunks.allSatisfy { $0.searchTerms.contains("pump") && $0.searchTerms.contains("verification") })
+        #expect(KnowledgeDocumentIndexer.searchTerms(for: "What is the inspection?") == ["inspection"])
+        #expect(chunks.first?.content.count ?? 0 <= 900)
     }
 }
 

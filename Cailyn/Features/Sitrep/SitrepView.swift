@@ -51,7 +51,7 @@ struct SitrepView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle("SITREP")
+        .navigationTitle("OVERVIEW")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -66,12 +66,30 @@ struct SitrepView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.system(.title, design: .serif, weight: .semibold))
+            HStack(spacing: 12) {
+                Image("CailynMark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 52, height: 52)
+                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 15, style: .continuous)
+                            .stroke(CailynTheme.champagne.opacity(0.42), lineWidth: 1)
+                    }
+                    .shadow(color: CailynTheme.champagne.opacity(0.18), radius: 12, y: 4)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("CAILYN")
+                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .tracking(2.4)
+                        .foregroundStyle(CailynTheme.champagne)
+                    Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                        .font(.system(.title, design: .serif, weight: .semibold))
+                }
+            }
             Text(attentionCount == 1 ? "1 thing needs your attention." : "\(attentionCount) things need your attention.")
                 .font(.title3)
                 .foregroundStyle(attentionCount > 0 ? CailynTheme.urgent : CailynTheme.champagne)
-                .accessibilityIdentifier("sitrep.attentionSummary")
+                .accessibilityIdentifier("overview.attentionSummary")
         }
     }
 

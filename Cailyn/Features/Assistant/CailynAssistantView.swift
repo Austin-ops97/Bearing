@@ -9,6 +9,8 @@ struct CailynAssistantView: View {
     @Query(sort: \CailynLogEntry.timestamp, order: .reverse) private var logs: [CailynLogEntry]
     @Query(sort: \CailynTurnoverNote.approvedAt, order: .reverse) private var turnovers: [CailynTurnoverNote]
     @Query private var knowledge: [CailynKnowledgeItem]
+    @Query private var knowledgeDocuments: [CailynKnowledgeDocument]
+    @Query private var knowledgeChunks: [CailynKnowledgeChunk]
     @Query private var routines: [CailynRoutine]
     @StateObject private var model = CailynLocalModelManager.shared
     @StateObject private var microsoft = MicrosoftGraphService.shared
@@ -27,7 +29,7 @@ struct CailynAssistantView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     VStack(alignment: .leading, spacing: 8) {
                         SectionHeading(title: "PRIVATE APP KNOWLEDGE", trailing: model.isLoaded ? "\(model.selectedModel.displayName.uppercased()) READY" : "ON-DEVICE MODEL")
-                        Text("Ask about your actions, events, shifts, routines, people, assets, logs, turnovers, notes, and connected work records.")
+                        Text("Ask about your actions, events, shifts, routines, people, assets, logs, turnovers, knowledge notes, uploaded documents, and connected work records.")
                             .font(.subheadline).foregroundStyle(.secondary)
                         Text("Cailyn retrieves only relevant records for each question. Your app data stays on-device; an answer cites the records it used and says when evidence is missing.")
                             .font(.footnote).foregroundStyle(.secondary)
@@ -45,7 +47,7 @@ struct CailynAssistantView: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(isAnswering || question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.canUseSelectedModel)
+                        .disabled(isAnswering || question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.selectedModelIsDownloaded)
                         if model.downloadedModels.count >= 2 {
                             Picker("Compare with", selection: Binding(
                                 get: {
@@ -152,16 +154,26 @@ struct CailynAssistantView: View {
         defer { isAnswering = false }
         do {
             let records = retrievedRecords(for: question)
-            sources = records.map(\.label)
-            let evidence = String(records.map { "[\($0.label)]\n\($0.content)" }.joined(separator: "\n\n").prefix(12_000))
+            let evidenceBundle = makeEvidenceBundle(from: records)
+            guard !evidenceBundle.records.isEmpty else {
+                answer = CailynModelPrompts.infoNotInKnowledgeBase
+                sources = []
+                return
+            }
+            sources = evidenceBundle.records.map(\.label)
             if let secondModelID {
                 comparison = try await model.compareAnswers(
                     question: question,
-                    evidence: evidence,
+                    evidence: evidenceBundle.text,
+                    sourceLabels: sources.map { "[\($0)]" },
                     secondModelID: secondModelID
                 )
             } else {
-                answer = try await model.answer(question: question, evidence: evidence)
+                answer = try await model.answer(
+                    question: question,
+                    evidence: evidenceBundle.text,
+                    sourceLabels: sources.map { "[\($0)]" }
+                )
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -191,6 +203,15 @@ struct CailynAssistantView: View {
         records += knowledge.map {
             EvidenceRecord(label: "Knowledge \($0.title)", content: "Title: \($0.title); source: \($0.source); body: \($0.body)")
         }
+        let documentTitles = Dictionary(uniqueKeysWithValues: knowledgeDocuments.map { ($0.id, $0.title) })
+        records += knowledgeChunks.compactMap { chunk in
+            guard let title = documentTitles[chunk.documentID] else { return nil }
+            return EvidenceRecord(
+                label: "Document: \(title), page \(chunk.pageNumber), section \(chunk.chunkNumber)",
+                content: chunk.content,
+                indexedTerms: chunk.searchTerms
+            )
+        }
         records += routines.map {
             EvidenceRecord(label: "Routine \($0.title)", content: "Title: \($0.title); schedule: \($0.scheduleDescription); shift: \($0.shiftRaw ?? "all shifts"); enabled: \($0.isEnabled); items: \($0.items.sorted { $0.sortOrder < $1.sortOrder }.map(\.title).joined(separator: ", "))")
         }
@@ -204,21 +225,50 @@ struct CailynAssistantView: View {
             }
         }
 
-        let queryTokens = Self.tokens(question)
+        let queryTokens = KnowledgeDocumentIndexer.searchTerms(for: question)
         return records
-            .map { record in (record, Self.tokens(record.label + " " + record.content).intersection(queryTokens).count) }
+            .map { record in
+                let searchableTerms = KnowledgeDocumentIndexer.searchTerms(for: record.label + " " + record.content)
+                    .union(record.indexedTerms.split(separator: " ").map(String.init))
+                return (record, searchableTerms.intersection(queryTokens).count)
+            }
             .filter { $0.1 > 0 }
-            .sorted { $0.1 > $1.1 }
+            .sorted {
+                if $0.1 == $1.1 { return $0.0.label < $1.0.label }
+                return $0.1 > $1.1
+            }
             .prefix(20)
             .map(\.0)
     }
 
-    private static func tokens(_ text: String) -> Set<String> {
-        Set(text.lowercased().split { !$0.isLetter && !$0.isNumber }.map(String.init).filter { $0.count > 1 })
+    private func makeEvidenceBundle(from records: [EvidenceRecord]) -> EvidenceBundle {
+        var selectedRecords: [EvidenceRecord] = []
+        var sections: [String] = []
+        var remainingCharacters = 12_000
+
+        for record in records {
+            let sourceLine = "[\(record.label)]\n"
+            let separator = sections.isEmpty ? "" : "\n\n"
+            let availableContentLength = remainingCharacters - separator.count - sourceLine.count
+            guard availableContentLength > 0 else { break }
+            let content = String(record.content.prefix(availableContentLength))
+            guard !content.isEmpty else { continue }
+            let section = separator + sourceLine + content
+            sections.append(section)
+            selectedRecords.append(record)
+            remainingCharacters -= section.count
+        }
+        return EvidenceBundle(records: selectedRecords, text: sections.joined())
     }
 
     private struct EvidenceRecord {
         let label: String
         let content: String
+        var indexedTerms = ""
+    }
+
+    private struct EvidenceBundle {
+        let records: [EvidenceRecord]
+        let text: String
     }
 }

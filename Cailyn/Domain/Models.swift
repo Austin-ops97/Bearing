@@ -12,7 +12,10 @@ enum CailynSchema {
         CailynRoutineItem.self,
         CailynTurnoverNote.self,
         CailynTemplate.self,
-        CailynKnowledgeItem.self
+        CailynKnowledgeItem.self,
+        CailynKnowledgeFolder.self,
+        CailynKnowledgeDocument.self,
+        CailynKnowledgeChunk.self
     ]
 }
 
@@ -565,5 +568,78 @@ final class CailynKnowledgeItem {
 
     var shareText: String {
         "\(title)\n\n\(body)\n\nSource: \(source)"
+    }
+}
+
+@Model
+final class CailynKnowledgeDocument {
+    var id: UUID
+    var title: String
+    var fileName: String
+    var folderID: UUID?
+    var importedAt: Date
+    var pageCount: Int
+    var chunkCount: Int
+    var contentHash: String
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        fileName: String,
+        folderID: UUID? = nil,
+        importedAt: Date = .now,
+        pageCount: Int,
+        chunkCount: Int,
+        contentHash: String
+    ) {
+        self.id = id
+        self.title = title
+        self.fileName = fileName
+        self.folderID = folderID
+        self.importedAt = importedAt
+        self.pageCount = pageCount
+        self.chunkCount = chunkCount
+        self.contentHash = contentHash
+    }
+}
+
+@Model
+final class CailynKnowledgeFolder {
+    var id: UUID
+    var name: String
+    var parentID: UUID?
+    var modifiedAt: Date
+
+    init(id: UUID = UUID(), name: String, parentID: UUID? = nil, modifiedAt: Date = .now) {
+        self.id = id
+        self.name = name
+        self.parentID = parentID
+        self.modifiedAt = modifiedAt
+    }
+}
+
+@Model
+final class CailynKnowledgeChunk {
+    var id: UUID
+    var documentID: UUID
+    var pageNumber: Int
+    var chunkNumber: Int
+    var content: String
+    var searchTerms: String
+
+    init(
+        id: UUID = UUID(),
+        documentID: UUID,
+        pageNumber: Int,
+        chunkNumber: Int,
+        content: String,
+        searchTerms: String
+    ) {
+        self.id = id
+        self.documentID = documentID
+        self.pageNumber = pageNumber
+        self.chunkNumber = chunkNumber
+        self.content = content
+        self.searchTerms = searchTerms
     }
 }

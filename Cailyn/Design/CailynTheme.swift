@@ -56,6 +56,12 @@ struct SectionHeading: View {
                 .font(.system(.caption, design: .rounded, weight: .bold))
                 .tracking(1.8)
                 .foregroundStyle(.secondary)
+                .overlay(alignment: .leading) {
+                    Capsule()
+                        .fill(CailynTheme.champagne)
+                        .frame(width: 3, height: 13)
+                        .offset(x: -9)
+                }
             Spacer()
             if let trailing {
                 Text(trailing)
@@ -98,7 +104,18 @@ extension View {
     func cailynSurface() -> some View {
         self
             .padding(16)
-            .background(CailynTheme.paperRaised.opacity(0.92), in: RoundedRectangle(cornerRadius: 14))
-            .overlay { RoundedRectangle(cornerRadius: 14).stroke(CailynTheme.line, lineWidth: 0.7) }
+            .background(
+                LinearGradient(
+                    colors: [CailynTheme.paperRaised, CailynTheme.paperRaised.opacity(0.88)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(CailynTheme.champagne.opacity(0.12), lineWidth: 0.8)
+            }
+            .shadow(color: CailynTheme.charcoal.opacity(0.07), radius: 14, y: 5)
     }
 }
