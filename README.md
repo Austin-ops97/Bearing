@@ -24,7 +24,11 @@ Calendar items created in Cailyn are also written to a dedicated Cailyn calendar
 
 AI planning/replanning, Microsoft account sign-in until Entra registration is configured, CloudKit synchronization, App Intents/Siri/Action Button commands, Spotlight, widgets, the Share extension, and optional biometric app locking are not implemented yet. Model downloads require an internet connection; inference does not.
 
-Development-only sample content is inserted for SwiftUI previews and debug builds only. Release builds start with an empty private store.
+The app no longer seeds sample operational records. A one-time cleanup removes records matching the previous demo fixtures from existing stores while keeping unrelated user-created records. SwiftUI previews use an empty in-memory store.
+
+On first launch, an initialization screen collects a display name, optional age, and preferred assistant tone (Professional, Warm, Cozy, Direct, or Wild). These preferences stay on-device and can be edited later. App Knowledge mode answers from indexed Cailyn records and cites sources. Conversation mode uses only the local model and recent chat turns, does not search app records or the internet, and has an explicit unknown-answer response. Wild mode permits occasional natural profanity but not language directed at people.
+
+The Experimental Bot Lab separates Persona & Instructions (prompt-only) from local LoRA fine-tuning. Fine-tuning trains a small adapter for the selected downloaded model and stores it separately from the base model; training examples and adapters stay on-device unless the user explicitly exports a JSONL training file. It requires a physical iPhone or iPad reporting at least 8 GB for models up to 3B parameters, or 12 GB for the 4B models, and is unavailable in Simulator. The bounded training run is experimental, not a guarantee of reliable retraining or factual accuracy.
 
 ## Generate and build
 

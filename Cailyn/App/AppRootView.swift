@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 enum AppSection: String, CaseIterable, Identifiable {
@@ -39,8 +40,11 @@ enum AppSection: String, CaseIterable, Identifiable {
 }
 
 struct AppRootView: View {
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.horizontalSizeClass) private var sizeClass
     @AppStorage("appearance.mode") private var appearanceMode = AppAppearance.dark.rawValue
+    @AppStorage(PersonalizationKey.completedOnboarding) private var didCompleteSetup = false
+    @AppStorage("migration.removeLegacyDemoData") private var didRemoveLegacyDemoData = false
     @State private var selection: AppSection = .overview
     @State private var navigationRoots = Dictionary(
         uniqueKeysWithValues: AppSection.allCases.map { ($0, UUID()) }
@@ -49,6 +53,7 @@ struct AppRootView: View {
     @State private var showsSearch = false
     @State private var captureMode: CaptureMode = .action
     @State private var startsCaptureInVoice = false
+    @State private var migrationError: String?
 
     var body: some View {
         Group {
@@ -63,6 +68,25 @@ struct AppRootView: View {
             CaptureView(initialMode: captureMode, startsVoiceCapture: startsCaptureInVoice)
         }
         .sheet(isPresented: $showsSearch) { CailynSearchView() }
+        .fullScreenCover(isPresented: Binding(
+            get: { !didCompleteSetup },
+            set: { _ in }
+        )) {
+            InitialSetupView()
+                .interactiveDismissDisabled()
+        }
+        .task {
+            removeLegacyDemoDataIfNeeded()
+        }
+        .alert("App Setup", isPresented: Binding(
+            get: { migrationError != nil },
+            set: { if !$0 { migrationError = nil } }
+        )) {
+            Button("Retry Cleanup") { removeLegacyDemoDataIfNeeded() }
+            Button("OK", role: .cancel) { migrationError = nil }
+        } message: {
+            Text(migrationError ?? "Unknown error")
+        }
         .preferredColorScheme(AppAppearance(rawValue: appearanceMode)?.colorScheme)
     }
 
@@ -140,6 +164,17 @@ struct AppRootView: View {
         showsCapture = true
     }
 
+    private func removeLegacyDemoDataIfNeeded() {
+        guard !didRemoveLegacyDemoData else { return }
+        do {
+            try LegacyDemoDataCleanup.removeLegacySamples(in: modelContext)
+            didRemoveLegacyDemoData = true
+            migrationError = nil
+        } catch {
+            migrationError = "Cailyn could not remove the old sample records: \(error.localizedDescription)"
+        }
+    }
+
     private var tabSelection: Binding<AppSection> {
         Binding(
             get: { selection },
@@ -183,6 +218,7 @@ private struct MoreView: View {
                     NavigationLink { PeopleView() } label: { Label("People", systemImage: "person.2") }
                     NavigationLink { KnowledgeView() } label: { Label("Knowledge", systemImage: "books.vertical") }
                     NavigationLink { CailynAssistantView() } label: { Label("Assistant", systemImage: "sparkles") }
+                    NavigationLink { ExperimentalBotView() } label: { Label("Experimental Bot Lab", systemImage: "testtube.2") }
                     NavigationLink { Microsoft365View() } label: { Label("Outlook & Teams", systemImage: "envelope.badge") }
                 }
                 Section("Operations") {
@@ -193,6 +229,7 @@ private struct MoreView: View {
                     NavigationLink { LogView() } label: { Label("Log", systemImage: "book.closed") }
                 }
                 Section {
+                    NavigationLink { InitialSetupView(isEditing: true) } label: { Label("Personalize Cailyn", systemImage: "person.crop.circle") }
                     NavigationLink { SettingsView() } label: { Label("Settings", systemImage: "gearshape") }
                 }
             }

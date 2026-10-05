@@ -21,6 +21,12 @@ struct CailynAssistantView: View {
     @State private var isAnswering = false
     @State private var comparison: LocalModelComparison?
     @State private var secondModelID = ""
+    @AppStorage(PersonalizationKey.chatMode) private var chatModeRaw = AssistantChatMode.knowledgeOnly.rawValue
+    @State private var conversation: [AssistantMessage] = []
+
+    private var chatMode: AssistantChatMode {
+        AssistantChatMode(rawValue: chatModeRaw) ?? .knowledgeOnly
+    }
 
     var body: some View {
         ZStack {
@@ -28,14 +34,33 @@ struct CailynAssistantView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     VStack(alignment: .leading, spacing: 8) {
-                        SectionHeading(title: "PRIVATE APP KNOWLEDGE", trailing: model.isLoaded ? "\(model.selectedModel.displayName.uppercased()) READY" : "ON-DEVICE MODEL")
-                        Text("Ask about your actions, events, shifts, routines, people, assets, logs, turnovers, knowledge notes, uploaded documents, and connected work records.")
-                            .font(.subheadline).foregroundStyle(.secondary)
-                        Text("Cailyn retrieves only relevant records for each question. Your app data stays on-device; an answer cites the records it used and says when evidence is missing.")
-                            .font(.footnote).foregroundStyle(.secondary)
+                        SectionHeading(
+                            title: chatMode == .knowledgeOnly ? "PRIVATE APP KNOWLEDGE" : "PRIVATE ON-DEVICE CHAT",
+                            trailing: model.isLoaded ? "\(model.selectedModel.displayName.uppercased()) READY" : "ON-DEVICE MODEL"
+                        )
+                        if chatMode == .knowledgeOnly {
+                            Text("Ask about your actions, events, shifts, routines, people, assets, logs, turnovers, knowledge notes, uploaded documents, and connected work records.")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                            Text("Cailyn retrieves only relevant records for each question. Your app data stays on-device; an answer cites the records it used and says when evidence is missing.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        } else {
+                            Text("The selected model can chat naturally using only this conversation’s recent turns. It does not search app records or the internet.")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
                     }
                     .cailynSurface()
 
+                    Picker("Assistant mode", selection: $chatModeRaw) {
+                        ForEach(AssistantChatMode.allCases) { mode in
+                            Text(mode.label).tag(mode.rawValue)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("assistant.mode")
+
+                    if chatMode == .conversation {
+                        conversationSurface
+                    } else {
                     VStack(alignment: .leading, spacing: 12) {
                         TextField("Ask a question about your records", text: $question, axis: .vertical)
                             .lineLimit(2...5)
@@ -136,6 +161,7 @@ struct CailynAssistantView: View {
                     }
                     .foregroundStyle(.primary)
                     .cailynSurface()
+                    }
                 }
                 .padding(22)
                 .frame(maxWidth: 780)
@@ -143,6 +169,64 @@ struct CailynAssistantView: View {
             }
         }
         .navigationTitle("ASSISTANT")
+    }
+
+    private var conversationSurface: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionHeading(title: "PRIVATE CONVERSATION", trailing: "NO INTERNET")
+            Text("Chat naturally with the selected on-device model. This mode does not retrieve Cailyn records or use the internet.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            if !conversation.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(conversation) { message in
+                        HStack {
+                            if message.isAssistant { Spacer(minLength: 32) }
+                            Text(message.text)
+                                .font(.subheadline)
+                                .padding(11)
+                                .background(
+                                    message.isAssistant ? CailynTheme.paperRaised : CailynTheme.champagne.opacity(0.2),
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                            if !message.isAssistant { Spacer(minLength: 32) }
+                        }
+                    }
+                }
+            }
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("Message Cailyn", text: $question, axis: .vertical)
+                    .lineLimit(1...4)
+                    .textFieldStyle(.roundedBorder)
+                Button {
+                    Task { await sendConversationalMessage() }
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill").font(.title2)
+                }
+                .disabled(isAnswering || question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.selectedModelIsDownloaded)
+                .accessibilityLabel("Send message")
+            }
+            if isAnswering {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Thinking privately on device…").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            if let errorMessage {
+                Text(errorMessage).font(.footnote).foregroundStyle(CailynTheme.urgent)
+            }
+            Button("Clear conversation", systemImage: "trash") {
+                conversation.removeAll()
+            }
+            .font(.footnote)
+            .disabled(conversation.isEmpty || isAnswering)
+            if !model.selectedModelIsDownloaded {
+                Label("Download an on-device model in Settings to chat.", systemImage: "arrow.down.circle")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .cailynSurface()
     }
 
     @MainActor
@@ -180,8 +264,59 @@ struct CailynAssistantView: View {
         }
     }
 
+    @MainActor
+    private func sendConversationalMessage() async {
+        let message = question.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !message.isEmpty, !isAnswering else { return }
+        question = ""
+        let history = conversation.map { (role: $0.isAssistant ? "assistant" : "user", text: $0.text) }
+        conversation.append(AssistantMessage(isAssistant: false, text: message))
+        isAnswering = true
+        errorMessage = nil
+        defer { isAnswering = false }
+        do {
+            if !model.isLoaded { await model.loadModel() }
+            guard model.isLoaded else {
+                errorMessage = model.errorMessage ?? "Download and load a supported on-device model in Settings."
+                return
+            }
+            let prompt = AssistantChatPrompts.conversationalTurn(history: history, userMessage: message)
+            let response = try await model.complete(
+                prompt: prompt,
+                systemInstructions: AssistantChatPrompts.system(
+                    name: AssistantPersonalization.displayName,
+                    age: AssistantPersonalization.age,
+                    tone: AssistantPersonalization.tone
+                )
+            )
+            let answer = response.trimmingCharacters(in: .whitespacesAndNewlines)
+            conversation.append(
+                AssistantMessage(
+                    isAssistant: true,
+                    text: answer.isEmpty ? AssistantChatPrompts.unknownAnswer : answer
+                )
+            )
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func retrievedRecords(for question: String) -> [EvidenceRecord] {
         var records: [EvidenceRecord] = []
+        var profileDetails: [String] = []
+        if !AssistantPersonalization.displayName.isEmpty {
+            profileDetails.append("Preferred name: \(AssistantPersonalization.displayName)")
+        }
+        if !AssistantPersonalization.age.isEmpty {
+            profileDetails.append("Age: \(AssistantPersonalization.age)")
+        }
+        if !profileDetails.isEmpty {
+            records.append(EvidenceRecord(
+                label: "Personal profile",
+                content: profileDetails.joined(separator: "; "),
+                indexedTerms: "profile name age old birthday"
+            ))
+        }
         records += actions.map {
             EvidenceRecord(label: "Action \($0.title)", content: "Title: \($0.title); details: \($0.details); status: \($0.status.label); priority: \($0.priority.label); due: \($0.dueAt?.formatted() ?? "not set"); shift: \($0.dueAt.flatMap { ShiftSchedule.stored.shift(containing: $0)?.title } ?? "not assigned")")
         }
@@ -269,6 +404,12 @@ struct CailynAssistantView: View {
 
     private struct EvidenceBundle {
         let records: [EvidenceRecord]
+        let text: String
+    }
+
+    private struct AssistantMessage: Identifiable {
+        let id = UUID()
+        let isAssistant: Bool
         let text: String
     }
 }

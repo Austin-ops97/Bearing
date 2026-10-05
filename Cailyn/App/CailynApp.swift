@@ -21,7 +21,6 @@ struct CailynApp: App {
             AppRootView()
                 .tint(CailynTheme.champagne)
                 .environmentObject(voice)
-                .task { DemoContent.seedIfNeeded(in: container.mainContext) }
                 .onOpenURL { url in
                     _ = MSALPublicClientApplication.handleMSALResponse(url, sourceApplication: nil)
                 }

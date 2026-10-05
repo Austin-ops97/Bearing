@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import Testing
 @testable import Cailyn
 
@@ -133,6 +134,97 @@ struct SpeechCaptureLimitTests {
         #expect(SpeechCaptureController.formattedRemainingTime(1_800) == "30:00")
         #expect(SpeechCaptureController.formattedRemainingTime(59.1) == "1:00")
         #expect(SpeechCaptureController.formattedRemainingTime(-1) == "0:00")
+    }
+}
+
+struct PersonalizationTests {
+    @Test func assistantSupportsFiveStylesAndBothConversationModes() {
+        #expect(AssistantTone.allCases.map(\.label) == ["Professional", "Warm", "Cozy", "Direct", "Wild"])
+        #expect(AssistantTone.wild.instruction.contains("occasional natural profanity"))
+        #expect(AssistantTone.wild.instruction.contains("never direct profanity at a person"))
+        #expect(AssistantChatMode.allCases.map(\.label) == ["App Knowledge", "Conversation"])
+    }
+
+    @Test func conversationPromptUsesRecentTurnsAndHonestUnknownFallback() {
+        let prompt = AssistantChatPrompts.conversationalTurn(
+            history: [(role: "user", text: "My truck is blue."), (role: "assistant", text: "Got it.")],
+            userMessage: "What color is my truck?"
+        )
+        #expect(prompt.contains("User: My truck is blue."))
+        #expect(prompt.contains("Cailyn: Got it."))
+        #expect(prompt.contains("What color is my truck?"))
+        #expect(AssistantChatPrompts.unknownAnswer.contains("I don't have access to the internet"))
+    }
+
+    @Test func experimentalTrainingExampleBuildsInstructionResponsePair() {
+        let example = BotTrainingExample(prompt: "How should I start shift?", response: "Review the turnover.")
+        #expect(example.trainingRow == "User: How should I start shift?\nAssistant: Review the turnover.")
+        #expect(ExperimentalBotService.minimumTrainingMemoryBytes(for: .qwen25) == 8_000_000_000)
+        #expect(ExperimentalBotService.minimumTrainingMemoryBytes(for: .gemma3) == 12_000_000_000)
+    }
+}
+
+@MainActor
+struct LegacyDemoDataCleanupTests {
+    @Test func removesKnownSeededActionsButKeepsUnrelatedUserData() throws {
+        let container = try ModelContainer(
+            for: Schema(CailynSchema.models),
+            configurations: [ModelConfiguration(isStoredInMemoryOnly: true)]
+        )
+        let context = container.mainContext
+        let person = CailynPerson(
+            displayName: "Mike Thompson",
+            email: "mike@example.com",
+            organization: "Operations",
+            role: "Maintenance Lead"
+        )
+        let asset = CailynAsset(
+            name: "Yankee 3",
+            category: "Unit",
+            area: "Fleet",
+            status: .attention,
+            details: "Battery charger issue"
+        )
+        context.insert(person)
+        context.insert(asset)
+        let sampleAction = CailynAction(
+            title: "Battery charger follow-up",
+            priority: .immediate,
+            estimatedDurationMinutes: 10,
+            timing: .deadline,
+            person: person,
+            asset: asset
+        )
+        context.insert(sampleAction)
+        context.insert(CailynAction(title: "Battery charger follow-up", details: "Keep this user note."))
+        context.insert(CailynAction(title: "My real task"))
+        context.insert(CailynLogEntry(text: "Yankee charger follow-up created", kind: .action, actionID: sampleAction.id))
+        try context.save()
+
+        try LegacyDemoDataCleanup.removeLegacySamples(in: context)
+        let remaining = try context.fetch(FetchDescriptor<CailynAction>())
+
+        #expect(Set(remaining.map(\.title)) == ["Battery charger follow-up", "My real task"])
+        #expect(remaining.first(where: { $0.title == "Battery charger follow-up" })?.details == "Keep this user note.")
+    }
+
+    @Test func preservesGenericShiftStartedLogWithoutOtherDemoSignatures() throws {
+        let container = try ModelContainer(
+            for: Schema(CailynSchema.models),
+            configurations: [ModelConfiguration(isStoredInMemoryOnly: true)]
+        )
+        let context = container.mainContext
+        let timestamp = Calendar.current.date(
+            from: DateComponents(year: 2026, month: 10, day: 5, hour: 6, minute: 3)
+        )!
+        context.insert(CailynLogEntry(timestamp: timestamp, text: "Shift started", kind: .manual))
+        try context.save()
+
+        try LegacyDemoDataCleanup.removeLegacySamples(in: context)
+        let remaining = try context.fetch(FetchDescriptor<CailynLogEntry>())
+
+        #expect(remaining.count == 1)
+        #expect(remaining.first?.text == "Shift started")
     }
 }
 

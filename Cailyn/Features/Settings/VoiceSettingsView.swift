@@ -133,6 +133,8 @@ struct SettingsView: View {
             }
             Section("Awareness") {
                 NavigationLink { VoiceSettingsView() } label: { Label("Voice & Verbal Awareness", systemImage: "waveform") }
+                NavigationLink { InitialSetupView(isEditing: true) } label: { Label("Personalize Cailyn", systemImage: "person.crop.circle") }
+                NavigationLink { InitialSetupView(isEditing: true) } label: { Label("Personalize Cailyn", systemImage: "person.crop.circle") }
             }
             Section {
                 Picker("Model Route", selection: $modelPreference) {
