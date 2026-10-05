@@ -8,7 +8,6 @@ enum CailynLanguageModel: String, CaseIterable, Identifiable, Sendable {
     case qwen3
     case falcon3
     case qwen25
-    case exaone35
 
     var id: String { rawValue }
 
@@ -21,7 +20,6 @@ enum CailynLanguageModel: String, CaseIterable, Identifiable, Sendable {
         case .qwen3: "Qwen3 4B"
         case .falcon3: "Falcon3 3B Instruct"
         case .qwen25: "Qwen2.5 3B Instruct"
-        case .exaone35: "EXAONE 3.5 2.4B Instruct"
         }
     }
 
@@ -34,7 +32,6 @@ enum CailynLanguageModel: String, CaseIterable, Identifiable, Sendable {
         case .qwen3: "mlx-community/Qwen3-4B-Instruct-2507-4bit"
         case .falcon3: "mlx-community/Falcon3-3B-Instruct-4bit"
         case .qwen25: "mlx-community/Qwen2.5-3B-Instruct-4bit"
-        case .exaone35: "mlx-community/EXAONE-3.5-2.4B-Instruct-4bit"
         }
     }
 
@@ -47,19 +44,12 @@ enum CailynLanguageModel: String, CaseIterable, Identifiable, Sendable {
         case .qwen3: "Apache 2.0"
         case .falcon3: "Falcon license"
         case .qwen25: "Qwen Research License"
-        case .exaone35: "EXAONE license"
         }
     }
 
-    var isSupportedByCurrentRuntime: Bool {
-        self != .exaone35
-    }
+    var isSupportedByCurrentRuntime: Bool { true }
 
-    var runtimeNote: String? {
-        isSupportedByCurrentRuntime
-            ? nil
-            : "This model uses a custom EXAONE 3.5 architecture that the bundled MLX Swift runtime does not support yet."
-    }
+    var runtimeNote: String? { nil }
 
     static let defaultModel: Self = .qwen25
     static let maximumDownloadedModels = 5

@@ -12,6 +12,7 @@ struct CailynAssistantView: View {
     @Query private var knowledgeDocuments: [CailynKnowledgeDocument]
     @Query private var knowledgeChunks: [CailynKnowledgeChunk]
     @Query private var routines: [CailynRoutine]
+    @Query private var reminders: [CailynReminder]
     @StateObject private var model = CailynLocalModelManager.shared
     @StateObject private var microsoft = MicrosoftGraphService.shared
     @State private var question = ""
@@ -344,11 +345,15 @@ struct CailynAssistantView: View {
             return EvidenceRecord(
                 label: "Document: \(title), page \(chunk.pageNumber), section \(chunk.chunkNumber)",
                 content: chunk.content,
-                indexedTerms: chunk.searchTerms
+                indexedTerms: chunk.searchTerms,
+                embeddingData: chunk.embeddingData ?? KnowledgeDocumentIndexer.sentenceEmbeddingData(for: chunk.content)
             )
         }
         records += routines.map {
             EvidenceRecord(label: "Routine \($0.title)", content: "Title: \($0.title); schedule: \($0.scheduleDescription); shift: \($0.shiftRaw ?? "all shifts"); enabled: \($0.isEnabled); items: \($0.items.sorted { $0.sortOrder < $1.sortOrder }.map(\.title).joined(separator: ", "))")
+        }
+        records += reminders.filter { !$0.isComplete }.map {
+            EvidenceRecord(label: "Reminder \($0.title)", content: "Title: \($0.title); due: \($0.dueAt.formatted()); urgency: \($0.urgency.label); alert: \($0.alertKind.label); notes: \($0.notes)")
         }
 
         if microsoft.isConnected {
@@ -360,13 +365,15 @@ struct CailynAssistantView: View {
             }
         }
 
-        let queryTokens = KnowledgeDocumentIndexer.searchTerms(for: question)
-        return records
-            .map { record in
-                let searchableTerms = KnowledgeDocumentIndexer.searchTerms(for: record.label + " " + record.content)
-                    .union(record.indexedTerms.split(separator: " ").map(String.init))
-                return (record, searchableTerms.intersection(queryTokens).count)
-            }
+        let tokenizedRecords = records.map { record in
+            KnowledgeDocumentIndexer.tokens(for: record.label + " " + (record.indexedTerms.isEmpty ? record.content : record.indexedTerms))
+        }
+        let scores = KnowledgeDocumentIndexer.hybridScores(
+            query: question,
+            documentTokens: tokenizedRecords,
+            embeddingData: records.map(\.embeddingData)
+        )
+        return zip(records, scores)
             .filter { $0.1 > 0 }
             .sorted {
                 if $0.1 == $1.1 { return $0.0.label < $1.0.label }
@@ -400,6 +407,7 @@ struct CailynAssistantView: View {
         let label: String
         let content: String
         var indexedTerms = ""
+        var embeddingData: Data? = nil
     }
 
     private struct EvidenceBundle {

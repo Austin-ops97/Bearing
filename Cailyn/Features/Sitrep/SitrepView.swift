@@ -7,7 +7,10 @@ struct SitrepView: View {
     @Query private var assets: [CailynAsset]
     @Query private var routines: [CailynRoutine]
     @Query private var events: [CailynCalendarEvent]
+    @Query private var reminders: [CailynReminder]
+    @State private var showsNewReminder = false
     let onSearch: () -> Void
+    let onOverview: () -> Void
 
     private var priorityActions: [CailynAction] {
         actions.filter { $0.status != .waiting && AttentionEngine.requiresAttention($0) }
@@ -40,9 +43,9 @@ struct SitrepView: View {
                     ViewThatFits(in: .horizontal) {
                         HStack(alignment: .top, spacing: 28) {
                             VStack(spacing: 28) { nextSection; prioritySection }.frame(maxWidth: .infinity)
-                            VStack(spacing: 28) { waitingSection; opsSection; routinesSection }.frame(maxWidth: .infinity)
+                            VStack(spacing: 28) { waitingSection; remindersSection; opsSection; routinesSection }.frame(maxWidth: .infinity)
                         }
-                        VStack(spacing: 28) { nextSection; prioritySection; waitingSection; opsSection; routinesSection }
+                        VStack(spacing: 28) { nextSection; prioritySection; waitingSection; remindersSection; opsSection; routinesSection }
                     }
                 }
                 .padding(.horizontal, 22)
@@ -53,6 +56,9 @@ struct SitrepView: View {
         }
         .navigationTitle("OVERVIEW")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showsNewReminder) {
+            ReminderEditorView()
+        }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button(action: speakBriefing) { Image(systemName: voice.isSpeaking ? "stop.circle" : "speaker.wave.2") }
@@ -67,24 +73,30 @@ struct SitrepView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
-                Image("CailynMark")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 52, height: 52)
-                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 15, style: .continuous)
-                            .stroke(CailynTheme.champagne.opacity(0.42), lineWidth: 1)
+                Button(action: onOverview) {
+                    HStack(spacing: 12) {
+                        Image("CailynMark")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 52, height: 52)
+                            .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                    .stroke(CailynTheme.champagne.opacity(0.42), lineWidth: 1)
+                            }
+                            .shadow(color: CailynTheme.champagne.opacity(0.18), radius: 12, y: 4)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("CAILYN")
+                                .font(.system(.caption, design: .rounded, weight: .bold))
+                                .tracking(2.4)
+                                .foregroundStyle(CailynTheme.champagne)
+                            Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                                .font(.system(.title, design: .serif, weight: .semibold))
+                        }
                     }
-                    .shadow(color: CailynTheme.champagne.opacity(0.18), radius: 12, y: 4)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("CAILYN")
-                        .font(.system(.caption, design: .rounded, weight: .bold))
-                        .tracking(2.4)
-                        .foregroundStyle(CailynTheme.champagne)
-                    Text(Date.now.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                        .font(.system(.title, design: .serif, weight: .semibold))
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Cailyn Overview")
             }
             Text(attentionCount == 1 ? "1 thing needs your attention." : "\(attentionCount) things need your attention.")
                 .font(.title3)
@@ -126,6 +138,52 @@ struct SitrepView: View {
                 ForEach(waiting) { action in WaitingSummaryRow(action: action) }
             }
         }
+    }
+
+    private var remindersSection: some View {
+        let items = ReminderListEntry.active(reminders: reminders, actions: actions, routines: routines)
+            .sorted(by: ReminderListEntry.precedes)
+            .prefix(3)
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                SectionHeading(title: "REMINDERS", trailing: "\(items.count)")
+                Spacer()
+                Button {
+                    showsNewReminder = true
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(CailynTheme.champagne)
+                }
+                .accessibilityLabel("Add reminder")
+            }
+            NavigationLink { RemindersView() } label: {
+                VStack(alignment: .leading, spacing: 0) {
+                if items.isEmpty {
+                    QuietState(text: "No upcoming reminders.")
+                } else {
+                    ForEach(Array(items)) { item in
+                        HStack {
+                            Image(systemName: item.alertKind == .prominentAlarm ? "alarm" : "bell")
+                                .foregroundStyle(item.urgency == .critical ? CailynTheme.urgent : CailynTheme.champagne)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(item.title).font(.headline).foregroundStyle(.primary)
+                                Text(item.dueAt.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text(item.urgency.label.uppercased())
+                                .font(.system(.caption2, design: .monospaced, weight: .bold))
+                                .foregroundStyle(item.urgency.rawValue >= ReminderUrgency.high.rawValue ? CailynTheme.urgent : .secondary)
+                        }
+                        .padding(.vertical, 9)
+                    }
+                }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .cailynSurface()
     }
 
     private var opsSection: some View {

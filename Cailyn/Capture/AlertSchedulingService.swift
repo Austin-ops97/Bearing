@@ -80,7 +80,7 @@ struct SystemAlertSchedulingService: AlertScheduling {
         let identifier = "cailyn.action.\(UUID().uuidString)"
         let content = UNMutableNotificationContent()
         content.title = title
-        content.body = notes.isEmpty ? "Cailyn action is due." : notes
+        content.body = notes.isEmpty ? "A Cailyn item is due." : notes
         content.sound = .default
         content.categoryIdentifier = "CAILYN_ACTION_DUE"
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)

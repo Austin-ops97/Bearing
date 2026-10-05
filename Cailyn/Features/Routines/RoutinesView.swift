@@ -4,6 +4,7 @@ import SwiftUI
 struct RoutinesView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \CailynRoutine.title) private var routines: [CailynRoutine]
+    @Query private var reminders: [CailynReminder]
     @State private var showsNewRoutine = false
     @State private var selection = Set<UUID>()
     @State private var pendingDeletion = Set<UUID>()
@@ -99,12 +100,21 @@ struct RoutinesView: View {
     }
 
     private func deletePending() {
+        let deletedRoutines = routines.filter { pendingDeletion.contains($0.id) }
+        let deletedRoutineIDs = Set(deletedRoutines.map(\.id))
+        let linkedReminders = reminders.filter { $0.routineID.map(deletedRoutineIDs.contains) ?? false }
         do {
-            routines.filter { pendingDeletion.contains($0.id) }.forEach(context.delete)
+            linkedReminders.forEach(context.delete)
+            deletedRoutines.forEach(context.delete)
             try context.save()
+            for reminder in linkedReminders {
+                SystemAlertSchedulingService().cancel(identifier: reminder.alertIdentifier, kind: reminder.alertKind)
+            }
             selection.subtract(pendingDeletion)
             pendingDeletion.removeAll()
         } catch {
+            linkedReminders.forEach(context.insert)
+            deletedRoutines.forEach(context.insert)
             errorMessage = error.localizedDescription
         }
     }
@@ -194,10 +204,27 @@ private struct NewRoutineView: View {
 struct RoutineDetailView: View {
     @Environment(\.modelContext) private var context
     @Bindable var routine: CailynRoutine
+    @Query private var reminders: [CailynReminder]
     @State private var newItemTitle = ""
+    @State private var showsReminderEditor = false
     @State private var errorMessage: String?
 
     private var sortedItems: [CailynRoutineItem] { routine.items.sorted { $0.sortOrder < $1.sortOrder } }
+    private var routineReminders: [CailynReminder] {
+        reminders.filter { $0.routineID == routine.id && !$0.isComplete }
+            .sorted { ReminderListEntry.precedes(
+                ReminderListEntry(
+                    id: $0.id, title: $0.title, notes: $0.notes, dueAt: $0.dueAt,
+                    urgency: $0.urgency, alertKind: $0.alertKind, routineTitle: routine.title,
+                    target: .reminder($0)
+                ),
+                ReminderListEntry(
+                    id: $1.id, title: $1.title, notes: $1.notes, dueAt: $1.dueAt,
+                    urgency: $1.urgency, alertKind: $1.alertKind, routineTitle: routine.title,
+                    target: .reminder($1)
+                )
+            ) }
+    }
 
     var body: some View {
         Form {
@@ -216,6 +243,23 @@ struct RoutineDetailView: View {
                     get: { routine.nextDue ?? .now },
                     set: { routine.nextDue = $0 }
                 ))
+            }
+            Section("Reminders") {
+                ForEach(routineReminders) { reminder in
+                    NavigationLink {
+                        ReminderDetailView(reminder: reminder)
+                    } label: {
+                        Label(
+                            "\(reminder.title) · \(reminder.dueAt.formatted(date: .abbreviated, time: .shortened))",
+                            systemImage: reminder.alertKind == .prominentAlarm ? "alarm" : "bell"
+                        )
+                    }
+                }
+                Button {
+                    showsReminderEditor = true
+                } label: {
+                    Label("Add Reminder or Alarm", systemImage: "bell.badge")
+                }
             }
             Section {
                 ForEach(sortedItems) { item in
@@ -255,9 +299,7 @@ struct RoutineDetailView: View {
                     saveChanges()
                 }
                 Button("Complete Routine") {
-                    routine.items.forEach { $0.completedAt = .now }
-                    routine.lastCompleted = .now
-                    saveChanges()
+                    completeRoutine()
                 }
                 .disabled(routine.items.isEmpty)
             }
@@ -265,6 +307,9 @@ struct RoutineDetailView: View {
         .navigationTitle(routine.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { EditButton() }
+        .sheet(isPresented: $showsReminderEditor) {
+            ReminderEditorView(routine: routine)
+        }
         .alert("Routine Could Not Be Saved", isPresented: Binding(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }
@@ -313,6 +358,28 @@ struct RoutineDetailView: View {
         do {
             try context.save()
         } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func completeRoutine() {
+        let activeReminders = routineReminders
+        let previousCompletionDates = routine.items.map(\.completedAt)
+        let previousLastCompleted = routine.lastCompleted
+        activeReminders.forEach { $0.isComplete = true }
+        routine.items.forEach { $0.completedAt = .now }
+        routine.lastCompleted = .now
+        do {
+            try context.save()
+            for reminder in activeReminders {
+                SystemAlertSchedulingService().cancel(identifier: reminder.alertIdentifier, kind: reminder.alertKind)
+            }
+        } catch {
+            for (item, previousDate) in zip(routine.items, previousCompletionDates) {
+                item.completedAt = previousDate
+            }
+            activeReminders.forEach { $0.isComplete = false }
+            routine.lastCompleted = previousLastCompleted
             errorMessage = error.localizedDescription
         }
     }

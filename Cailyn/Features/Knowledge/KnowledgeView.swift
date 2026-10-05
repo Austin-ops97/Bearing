@@ -256,7 +256,8 @@ struct KnowledgeView: View {
                         pageNumber: chunk.pageNumber,
                         chunkNumber: chunk.chunkNumber,
                         content: chunk.content,
-                        searchTerms: chunk.searchTerms
+                        searchTerms: chunk.searchTerms,
+                        embeddingData: chunk.embeddingData
                     ))
                 }
                 try context.save()

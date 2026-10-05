@@ -15,7 +15,8 @@ enum CailynSchema {
         CailynKnowledgeItem.self,
         CailynKnowledgeFolder.self,
         CailynKnowledgeDocument.self,
-        CailynKnowledgeChunk.self
+        CailynKnowledgeChunk.self,
+        CailynReminder.self
     ]
 }
 
@@ -437,6 +438,74 @@ final class CailynRoutineItem {
     }
 }
 
+enum ReminderUrgency: Int, Codable, CaseIterable, Identifiable, Sendable {
+    case routine = 0
+    case normal = 1
+    case high = 2
+    case critical = 3
+
+    var id: Int { rawValue }
+    var label: String {
+        switch self {
+        case .routine: "Routine"
+        case .normal: "Normal"
+        case .high: "High"
+        case .critical: "Critical"
+        }
+    }
+}
+
+@Model
+final class CailynReminder {
+    var id: UUID
+    var title: String
+    var notes: String
+    var dueAt: Date
+    var urgencyRaw: Int
+    var alertKindRaw: String
+    var alertIdentifier: String?
+    var alertScheduledAt: Date?
+    var routineID: UUID?
+    var isComplete: Bool
+    var createdAt: Date
+
+    var urgency: ReminderUrgency {
+        get { ReminderUrgency(rawValue: urgencyRaw) ?? .normal }
+        set { urgencyRaw = newValue.rawValue }
+    }
+
+    var alertKind: ActionAlertKind {
+        get { ActionAlertKind(rawValue: alertKindRaw) ?? .none }
+        set { alertKindRaw = newValue.rawValue }
+    }
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        notes: String = "",
+        dueAt: Date,
+        urgency: ReminderUrgency = .normal,
+        alertKind: ActionAlertKind = .none,
+        alertIdentifier: String? = nil,
+        alertScheduledAt: Date? = nil,
+        routineID: UUID? = nil,
+        isComplete: Bool = false,
+        createdAt: Date = .now
+    ) {
+        self.id = id
+        self.title = title
+        self.notes = notes
+        self.dueAt = dueAt
+        self.urgencyRaw = urgency.rawValue
+        self.alertKindRaw = alertKind.rawValue
+        self.alertIdentifier = alertIdentifier
+        self.alertScheduledAt = alertScheduledAt
+        self.routineID = routineID
+        self.isComplete = isComplete
+        self.createdAt = createdAt
+    }
+}
+
 @Model
 final class CailynTurnoverNote {
     var id: UUID
@@ -626,6 +695,7 @@ final class CailynKnowledgeChunk {
     var chunkNumber: Int
     var content: String
     var searchTerms: String
+    var embeddingData: Data?
 
     init(
         id: UUID = UUID(),
@@ -633,7 +703,8 @@ final class CailynKnowledgeChunk {
         pageNumber: Int,
         chunkNumber: Int,
         content: String,
-        searchTerms: String
+        searchTerms: String,
+        embeddingData: Data? = nil
     ) {
         self.id = id
         self.documentID = documentID
@@ -641,5 +712,6 @@ final class CailynKnowledgeChunk {
         self.chunkNumber = chunkNumber
         self.content = content
         self.searchTerms = searchTerms
+        self.embeddingData = embeddingData
     }
 }

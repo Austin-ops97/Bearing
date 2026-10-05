@@ -108,6 +108,53 @@ struct KnowledgeDocumentIndexerTests {
         #expect(KnowledgeDocumentIndexer.searchTerms(for: "What is the inspection?") == ["inspection"])
         #expect(chunks.first?.content.count ?? 0 <= 900)
     }
+
+    @Test func chunksPreferParagraphAndSentenceBoundaries() {
+        let firstParagraph = String(repeating: "Pump inspections require lockout verification. ", count: 14)
+        let secondParagraph = String(repeating: "Valve inspections require pressure isolation. ", count: 14)
+        let chunks = KnowledgeDocumentIndexer.makeChunks(
+            from: firstParagraph + "\n\n" + secondParagraph,
+            pageNumber: 1
+        )
+
+        #expect(chunks.count == 2)
+        #expect(chunks[0].content.contains("lockout verification"))
+        #expect(!chunks[0].content.contains("Valve inspections"))
+        #expect(chunks[1].content.contains("Valve inspections"))
+    }
+
+    @Test func hybridSearchWeightsRareAndRepeatedTermsAboveCommonMatches() {
+        let tokens = [
+            ["pump", "inspection", "pump", "verification"],
+            Array(repeating: "inspection", count: 24),
+            ["calendar", "meeting"]
+        ]
+        let scores = KnowledgeDocumentIndexer.hybridScores(
+            query: "pump inspection",
+            documentTokens: tokens,
+            embeddingData: [nil, nil, nil]
+        )
+
+        #expect(scores[0] > scores[1])
+        #expect(scores[1] > scores[2])
+        #expect(KnowledgeDocumentIndexer.hybridScores(
+            query: "unmatched",
+            documentTokens: tokens,
+            embeddingData: [nil, nil, nil]
+        ).allSatisfy { $0 == 0 })
+    }
+
+    @Test func semanticSearchCanFindRelevantLanguageWithoutLexicalOverlap() throws {
+        let safety = KnowledgeDocumentIndexer.sentenceEmbeddingData(for: "safety hazard")
+        let benefits = KnowledgeDocumentIndexer.sentenceEmbeddingData(for: "employee benefits")
+        guard let safety, let benefits else { return }
+        let scores = KnowledgeDocumentIndexer.hybridScores(
+            query: "danger",
+            documentTokens: [[], []],
+            embeddingData: [safety, benefits]
+        )
+        #expect(scores[0] > scores[1])
+    }
 }
 
 struct LocalModelMemoryTests {
@@ -116,15 +163,66 @@ struct LocalModelMemoryTests {
         #expect(!CailynLocalModelManager.supportsModel(memoryBytes: 3_999_999_999))
     }
 
-    @Test func modelLibraryProvidesEightChoicesWithFiveDownloadLimit() {
-        #expect(CailynLanguageModel.allCases.count == 8)
+    @Test func modelLibraryProvidesSevenChoicesWithFiveDownloadLimit() {
+        #expect(CailynLanguageModel.allCases.count == 7)
         #expect(CailynLanguageModel.maximumDownloadedModels == 5)
-        #expect(CailynLanguageModel.allCases.filter(\.isSupportedByCurrentRuntime).count == 7)
+        #expect(CailynLanguageModel.allCases.allSatisfy { $0.isSupportedByCurrentRuntime })
+        #expect(!CailynLanguageModel.allCases.contains { $0.displayName.localizedCaseInsensitiveContains("exaone") })
         #expect(CailynLanguageModel.defaultModel == .qwen25)
         #expect(CailynLanguageModel.canDownloadModel(downloadedCount: 4, isAlreadyDownloaded: false))
         #expect(!CailynLanguageModel.canDownloadModel(downloadedCount: 5, isAlreadyDownloaded: false))
         #expect(!CailynLanguageModel.canDownloadModel(downloadedCount: -1, isAlreadyDownloaded: false))
         #expect(CailynLanguageModel.canDownloadModel(downloadedCount: 5, isAlreadyDownloaded: true))
+    }
+}
+
+struct ReminderOrderingTests {
+    @Test func routineRemindersAndActionAlertsShareTheUnifiedList() {
+        let routine = CailynRoutine(title: "Opening", scheduleDescription: "Daily")
+        let routineReminder = CailynReminder(
+            title: "Opening checks",
+            dueAt: .now,
+            urgency: .high,
+            alertKind: .prominentAlarm,
+            routineID: routine.id
+        )
+        let action = CailynAction(
+            title: "Review report",
+            priority: .immediate,
+            dueAt: .now.addingTimeInterval(300),
+            alertKind: .reminder
+        )
+
+        let entries = ReminderListEntry.active(
+            reminders: [routineReminder],
+            actions: [action],
+            routines: [routine]
+        )
+
+        #expect(entries.count == 2)
+        #expect(entries.first(where: { $0.id == routineReminder.id })?.routineTitle == "Opening")
+        #expect(entries.first(where: { $0.id == action.id })?.urgency == .critical)
+    }
+
+    @Test func urgencyTakesPriorityAndChronologyBreaksTies() {
+        let tomorrow = Date.now.addingTimeInterval(86_400)
+        let laterCritical = ReminderListEntry(
+            id: UUID(), title: "Critical", notes: "", dueAt: tomorrow,
+            urgency: .critical, alertKind: .prominentAlarm, routineTitle: nil,
+            target: .reminder(CailynReminder(title: "Critical", dueAt: tomorrow, urgency: .critical, alertKind: .prominentAlarm))
+        )
+        let earlierNormal = ReminderListEntry(
+            id: UUID(), title: "Normal", notes: "", dueAt: .now,
+            urgency: .normal, alertKind: .reminder, routineTitle: nil,
+            target: .reminder(CailynReminder(title: "Normal", dueAt: .now, urgency: .normal, alertKind: .reminder))
+        )
+
+        #expect(ReminderListEntry.precedes(laterCritical, earlierNormal))
+        #expect(ReminderListEntry.precedes(earlierNormal, ReminderListEntry(
+            id: UUID(), title: "Later normal", notes: "", dueAt: tomorrow,
+            urgency: .normal, alertKind: .reminder, routineTitle: nil,
+            target: .reminder(CailynReminder(title: "Later normal", dueAt: tomorrow))
+        )))
     }
 }
 

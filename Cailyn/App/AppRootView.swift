@@ -6,6 +6,8 @@ enum AppSection: String, CaseIterable, Identifiable {
     case plan = "PLAN"
     case events = "EVENTS"
     case routines = "ROUTINES"
+    case reminders = "REMINDERS"
+    case alarms = "ALARMS"
     case actions = "ACTIONS"
     case templates = "TEMPLATES"
     case people = "PEOPLE"
@@ -25,6 +27,8 @@ enum AppSection: String, CaseIterable, Identifiable {
         case .plan: "calendar"
         case .events: "calendar.badge.clock"
         case .routines: "checklist"
+        case .reminders: "bell"
+        case .alarms: "alarm"
         case .actions: "checkmark.circle"
         case .templates: "rectangle.3.group"
         case .ops: "square.3.layers.3d"
@@ -109,7 +113,11 @@ struct AppRootView: View {
     private var iPadLayout: some View {
         NavigationSplitView {
             VStack(spacing: 0) {
-                CailynWordmark()
+                    Button { selectRoot(.overview) } label: {
+                        CailynWordmark()
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("navigation.overview.logo")
                     .padding(.horizontal, 20)
                     .padding(.vertical, 28)
 
@@ -184,16 +192,24 @@ struct AppRootView: View {
 
     private func selectRoot(_ section: AppSection) {
         selection = section
-        navigationRoots[section] = UUID()
+        for root in AppSection.allCases {
+            navigationRoots[root] = UUID()
+        }
     }
 
     @ViewBuilder
     private func destination(for section: AppSection) -> some View {
         switch section {
-        case .overview: SitrepView(onSearch: { showsSearch = true })
+        case .overview:
+            SitrepView(
+                onSearch: { showsSearch = true },
+                onOverview: { selectRoot(.overview) }
+            )
         case .plan: PlanView()
         case .events: EventsView()
         case .routines: RoutinesView()
+        case .reminders: RemindersView()
+        case .alarms: RemindersView(showsAlarmsOnly: true)
         case .actions: ActionsView()
         case .templates: TemplatesView()
         case .ops: OpsView()
@@ -215,6 +231,8 @@ private struct MoreView: View {
             List {
                 Section("Cailyn") {
                     NavigationLink { ActionsView() } label: { Label("Actions", systemImage: "checkmark.circle") }
+                    NavigationLink { RemindersView() } label: { Label("Reminders", systemImage: "bell") }
+                    NavigationLink { RemindersView(showsAlarmsOnly: true) } label: { Label("Alarms", systemImage: "alarm") }
                     NavigationLink { PeopleView() } label: { Label("People", systemImage: "person.2") }
                     NavigationLink { KnowledgeView() } label: { Label("Knowledge", systemImage: "books.vertical") }
                     NavigationLink { CailynAssistantView() } label: { Label("Assistant", systemImage: "sparkles") }

@@ -20,6 +20,7 @@
 		1BF767CFB32AE5A56AB1DAF7 /* WorkShift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8396826F3E560B2B0C058A67 /* WorkShift.swift */; };
 		1CC530253F493BEB66241732 /* MLXHuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = F6F441613FAC9E35E513AC48 /* MLXHuggingFace */; };
 		1D5F2EBFB7FFCFEA377A85F1 /* LocalRuleIntelligenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CB9364EABECB44CCD854BA /* LocalRuleIntelligenceTests.swift */; };
+		2183DB8D1F99BCAF2DE6BB8E /* RemindersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF793FBC582F28CDA7EBE8 /* RemindersView.swift */; };
 		2ED182BAEEA8ED6E12960601 /* ActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD555DC43CACA0E9C5852042 /* ActionsView.swift */; };
 		3148289FBA1B1262375186A7 /* VoiceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE52A178C22D517379183A9 /* VoiceEngine.swift */; };
 		346AE45062291641218D0A1D /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641FF719714049D46E02EF26 /* RoutinesView.swift */; };
@@ -109,6 +110,7 @@
 		B7D68DB6138314B152D01D9F /* OpsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpsView.swift; sourceTree = "<group>"; };
 		BB8D92792BB095923964A9A8 /* AlertSchedulingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSchedulingService.swift; sourceTree = "<group>"; };
 		BF0A82A1851CDD98D95D2168 /* CailynTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CailynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0FF793FBC582F28CDA7EBE8 /* RemindersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersView.swift; sourceTree = "<group>"; };
 		CD555DC43CACA0E9C5852042 /* ActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsView.swift; sourceTree = "<group>"; };
 		D2FF9E9EB5EAAEE5AAB34467 /* CailynAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynAssistantView.swift; sourceTree = "<group>"; };
 		D5BFADFE21EFC0CB65F746D9 /* PlanningEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanningEngineTests.swift; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 				CB24DBD64169D6B3D37A8972 /* Ops */,
 				18201300587DC8E3337C6134 /* People */,
 				8584B45271AD1AC849389FF7 /* Plan */,
+				95C414EE00FAF9B414A15C0E /* Reminders */,
 				F84C6C225E686EDE289548DD /* Routines */,
 				0008CEEE6975A3B7F6BC7D4A /* Search */,
 				F8539708885F33B220BAAC17 /* Settings */,
@@ -329,6 +332,14 @@
 				B750542F2E95DE9C2600782F /* LegacyDemoDataCleanup.swift */,
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		95C414EE00FAF9B414A15C0E /* Reminders */ = {
+			isa = PBXGroup;
+			children = (
+				C0FF793FBC582F28CDA7EBE8 /* RemindersView.swift */,
+			);
+			path = Reminders;
 			sourceTree = "<group>";
 		};
 		A31B54B5A7EBE41FF76A6D25 /* Capture */ = {
@@ -582,6 +593,7 @@
 				9FF2E72BF69567AF9C923244 /* PlanView.swift in Sources */,
 				5DDF12EBE03A2506E4841E84 /* PlanningEngine.swift in Sources */,
 				D34155196914F622D2F8E619 /* PreviewSupport.swift in Sources */,
+				2183DB8D1F99BCAF2DE6BB8E /* RemindersView.swift in Sources */,
 				346AE45062291641218D0A1D /* RoutinesView.swift in Sources */,
 				4D64F686F83333350D79E1B2 /* ShiftScheduleView.swift in Sources */,
 				6D031F4231C941E28A00CFFA /* SitrepView.swift in Sources */,
