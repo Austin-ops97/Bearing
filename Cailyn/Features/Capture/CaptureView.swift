@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftData
 import SwiftUI
 
@@ -25,8 +26,11 @@ struct CaptureView: View {
     private let intelligence: any IntelligenceService = HybridIntelligenceService()
     private let alerts: any AlertScheduling = SystemAlertSchedulingService()
 
-    init(initialMode: CaptureMode = .action) {
+    private let startsVoiceCapture: Bool
+
+    init(initialMode: CaptureMode = .action, startsVoiceCapture: Bool = false) {
         _mode = State(initialValue: initialMode)
+        self.startsVoiceCapture = startsVoiceCapture
     }
 
     var body: some View {
@@ -79,6 +83,17 @@ struct CaptureView: View {
             .onChange(of: mode) { _, _ in resetInterpretation() }
             .onChange(of: source) { _, newValue in
                 if newValue == .typed { speech.cancel(); isFocused = true }
+            }
+            .onAppear {
+                guard startsVoiceCapture else { return }
+                source = .voice
+                Task { await speech.start() }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)) { notification in
+                guard speech.isListening,
+                      let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+                      AVAudioSession.InterruptionType(rawValue: rawType) == .began else { return }
+                Task { await speech.stop() }
             }
             .onDisappear { speech.cancel() }
             .alert("Capture Needs Attention", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
@@ -174,7 +189,7 @@ struct CaptureView: View {
         switch speech.state {
         case .idle: "On-device only. No recording is kept."
         case .requestingPermission: "Checking private speech access…"
-        case .listening: "On-device · stops after 2 seconds of silence"
+        case .listening: "On-device · \(SpeechCaptureController.formattedRemainingTime(speech.remainingCaptureTime)) remaining · continues while locked"
         case .finishing: "Finalizing transcript before review…"
         case .unavailable(let message), .failed(let message): message
         }
@@ -182,8 +197,8 @@ struct CaptureView: View {
 
     private var privacyNote: some View {
         Label(mode == .turnover
-              ? "Audio is never stored. The original text transcript is retained beside the organized turnover so facts can be verified."
-              : "Nothing is created or scheduled until you approve the interpretation. Voice audio is never stored.",
+              ? "Audio is never stored. Live transcription can continue while locked, for up to 30 minutes. iOS audio interruptions can end capture."
+              : "Nothing is created or scheduled until you approve the interpretation. Audio is never stored; capture can continue while locked for up to 30 minutes, subject to iOS audio interruptions.",
               systemImage: "lock.shield")
             .font(.footnote).foregroundStyle(.secondary)
     }

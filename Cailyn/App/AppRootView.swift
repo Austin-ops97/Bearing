@@ -47,6 +47,8 @@ struct AppRootView: View {
     )
     @State private var showsCapture = false
     @State private var showsSearch = false
+    @State private var captureMode: CaptureMode = .action
+    @State private var startsCaptureInVoice = false
 
     var body: some View {
         Group {
@@ -57,7 +59,9 @@ struct AppRootView: View {
             }
         }
         .background(CailynTheme.paper)
-        .sheet(isPresented: $showsCapture) { CaptureView() }
+        .sheet(isPresented: $showsCapture) {
+            CaptureView(initialMode: captureMode, startsVoiceCapture: startsCaptureInVoice)
+        }
         .sheet(isPresented: $showsSearch) { CailynSearchView() }
         .preferredColorScheme(AppAppearance(rawValue: appearanceMode)?.colorScheme)
     }
@@ -72,7 +76,7 @@ struct AppRootView: View {
             }
         }
         .safeAreaInset(edge: .bottom, alignment: .trailing) {
-            CaptureButton { showsCapture = true }
+            captureButton
                 .padding(.trailing, 18)
                 .padding(.bottom, 58)
         }
@@ -116,10 +120,24 @@ struct AppRootView: View {
             NavigationStack { destination(for: selection) }
                 .id(navigationRoots[selection])
                 .overlay(alignment: .bottomTrailing) {
-                    CaptureButton { showsCapture = true }.padding(28)
+                    captureButton.padding(28)
                 }
         }
         .navigationSplitViewStyle(.balanced)
+    }
+
+    private var captureButton: some View {
+        CaptureButton(
+            action: { openCapture(mode: .action, startsInVoice: false) },
+            voiceAction: { openCapture(mode: .action, startsInVoice: true) },
+            turnoverAction: { openCapture(mode: .turnover, startsInVoice: true) }
+        )
+    }
+
+    private func openCapture(mode: CaptureMode, startsInVoice: Bool) {
+        captureMode = mode
+        startsCaptureInVoice = startsInVoice
+        showsCapture = true
     }
 
     private var tabSelection: Binding<AppSection> {
@@ -244,6 +262,8 @@ private struct CailynWordmark: View {
 
 private struct CaptureButton: View {
     let action: () -> Void
+    let voiceAction: () -> Void
+    let turnoverAction: () -> Void
 
     var body: some View {
         Button(action: action) {
@@ -258,5 +278,13 @@ private struct CaptureButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("capture.open")
+        .contextMenu {
+            Button(action: voiceAction) {
+                Label("Voice", systemImage: "waveform")
+            }
+            Button(action: turnoverAction) {
+                Label("Shift Turnover", systemImage: "arrow.left.arrow.right")
+            }
+        }
     }
 }

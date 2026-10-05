@@ -637,7 +637,7 @@
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Cailyn creates and updates events in a dedicated Cailyn calendar after you approve them.";
 				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Cailyn adds approved events to a dedicated Cailyn calendar.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Cailyn can use Face ID to protect your private operational information.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cailyn uses the microphone only while you are capturing a note. Audio is not saved.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cailyn uses the microphone during voice capture, including while the device is locked. Audio is not saved.";
 				INFOPLIST_KEY_NSPersonalVoiceUsageDescription = "Cailyn can use a Personal Voice only when you explicitly authorize it for spoken awareness.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Cailyn transcribes your voice on device so you can review captured actions and shift notes.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -753,7 +753,7 @@
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Cailyn creates and updates events in a dedicated Cailyn calendar after you approve them.";
 				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Cailyn adds approved events to a dedicated Cailyn calendar.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Cailyn can use Face ID to protect your private operational information.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cailyn uses the microphone only while you are capturing a note. Audio is not saved.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Cailyn uses the microphone during voice capture, including while the device is locked. Audio is not saved.";
 				INFOPLIST_KEY_NSPersonalVoiceUsageDescription = "Cailyn can use a Personal Voice only when you explicitly authorize it for spoken awareness.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Cailyn transcribes your voice on device so you can review captured actions and shift notes.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

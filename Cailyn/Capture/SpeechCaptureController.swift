@@ -17,21 +17,30 @@ final class SpeechCaptureController: ObservableObject {
     @Published private(set) var transcript = ""
     @Published private(set) var audioLevel: Float = 0
     @Published private(set) var completedTranscriptGeneration = 0
+    @Published private(set) var remainingCaptureTime = maximumCaptureDuration
 
     private let audioInput = AudioInputEngine()
-    private let silenceDetector = AudioSilenceDetector()
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var speechRecognizer: SFSpeechRecognizer?
     private var committedTranscript = ""
     private var activeGeneration: UUID?
     private var sessionGeneration: UUID?
+    private var durationLimitTask: Task<Void, Never>?
+    private var captureStartedAt: TimeInterval?
     private var lastTranscriptPublish = Date.distantPast
     private let requestRelay = AudioRequestRelay()
     private let meterGate = AudioMeterGate(minimumInterval: 0.1)
 
+    nonisolated static let maximumCaptureDuration: TimeInterval = 30 * 60
+
     var isListening: Bool { state == .listening }
     var isBusy: Bool { state == .requestingPermission || state == .listening || state == .finishing }
+
+    nonisolated static func formattedRemainingTime(_ remaining: TimeInterval) -> String {
+        let seconds = max(0, Int(remaining.rounded(.up)))
+        return String(format: "%d:%02d", seconds / 60, seconds % 60)
+    }
 
     func start(locale: Locale = .current) async {
         guard !isBusy else { return }
@@ -63,27 +72,20 @@ final class SpeechCaptureController: ObservableObject {
             transcript = ""
             committedTranscript = ""
             lastTranscriptPublish = .distantPast
-            silenceDetector.reset()
             speechRecognizer = recognizer
             beginRecognitionCycle(with: recognizer, generation: generation)
             try await audioInput.start(
                 relay: requestRelay,
                 meter: meterGate,
-                silenceDetector: silenceDetector,
                 onMeter: { [weak self] level in
                     Task { @MainActor in
                         guard self?.activeGeneration == generation else { return }
                         self?.audioLevel = level
                     }
-                },
-                onSilence: { [weak self] in
-                    Task { @MainActor in
-                        guard let self, self.activeGeneration == generation, self.state == .listening else { return }
-                        await self.stop()
-                    }
                 }
             )
             state = .listening
+            startDurationLimit(for: generation)
         } catch {
             await cleanup(setIdle: false)
             state = .failed("Voice capture could not start: \(error.localizedDescription)")
@@ -93,6 +95,7 @@ final class SpeechCaptureController: ObservableObject {
     func stop() async {
         guard isListening else { return }
         state = .finishing
+        cancelDurationLimit()
         await audioInput.stop()
         recognitionRequest?.endAudio()
         audioLevel = 0
@@ -104,21 +107,54 @@ final class SpeechCaptureController: ObservableObject {
     }
 
     func cancel() {
+        cancelDurationLimit()
         activeGeneration = nil
         state = .idle
         transcript = ""
+        remainingCaptureTime = Self.maximumCaptureDuration
         recognitionTask?.cancel()
         requestRelay.set(nil)
         Task { await cleanup() }
     }
 
     func reset(keepingTranscript: Bool = false) {
+        cancelDurationLimit()
         activeGeneration = nil
         recognitionTask?.cancel()
         requestRelay.set(nil)
         if !keepingTranscript { transcript = "" }
+        remainingCaptureTime = Self.maximumCaptureDuration
         state = .idle
         Task { await cleanup() }
+    }
+
+    private func startDurationLimit(for generation: UUID) {
+        captureStartedAt = ProcessInfo.processInfo.systemUptime
+        remainingCaptureTime = Self.maximumCaptureDuration
+        durationLimitTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: .seconds(1))
+                } catch {
+                    return
+                }
+                guard let self, self.activeGeneration == generation, self.state == .listening,
+                      let captureStartedAt = self.captureStartedAt else { return }
+                let elapsed = ProcessInfo.processInfo.systemUptime - captureStartedAt
+                self.remainingCaptureTime = max(0, Self.maximumCaptureDuration - elapsed)
+                if elapsed >= Self.maximumCaptureDuration {
+                    self.durationLimitTask = nil
+                    await self.stop()
+                    return
+                }
+            }
+        }
+    }
+
+    private func cancelDurationLimit() {
+        durationLimitTask?.cancel()
+        durationLimitTask = nil
+        captureStartedAt = nil
     }
 
     private func beginRecognitionCycle(with recognizer: SFSpeechRecognizer, generation: UUID) {
@@ -175,6 +211,7 @@ final class SpeechCaptureController: ObservableObject {
     }
 
     private func cleanup(setIdle: Bool = true) async {
+        cancelDurationLimit()
         await audioInput.stop()
         recognitionTask?.cancel()
         recognitionTask = nil
@@ -240,9 +277,7 @@ private actor AudioInputEngine {
     func start(
         relay: AudioRequestRelay,
         meter: AudioMeterGate,
-        silenceDetector: AudioSilenceDetector,
-        onMeter: @escaping @Sendable (Float) -> Void,
-        onSilence: @escaping @Sendable () -> Void
+        onMeter: @escaping @Sendable (Float) -> Void
     ) throws {
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
@@ -262,7 +297,6 @@ private actor AudioInputEngine {
             }
             let rms = Float(sqrt(sum / Double(frames)))
             if meter.shouldPublish() { onMeter(min(1, rms * 12)) }
-            if silenceDetector.didDetectSilence(rms: rms) { onSilence() }
         }
         installedTap = true
         engine.prepare()
@@ -309,37 +343,6 @@ private final class AudioMeterGate: @unchecked Sendable {
         let now = Date()
         guard now.timeIntervalSince(lastPublish) >= minimumInterval else { return false }
         lastPublish = now
-        return true
-    }
-}
-
-private final class AudioSilenceDetector: @unchecked Sendable {
-    private let lock = NSLock()
-    private let silenceDuration: TimeInterval = 2
-    private let speechThreshold: Float = 0.008
-    private var hasHeardSpeech = false
-    private var lastSpeechTime: TimeInterval = 0
-    private var didFire = false
-
-    func reset() {
-        lock.lock()
-        hasHeardSpeech = false
-        lastSpeechTime = 0
-        didFire = false
-        lock.unlock()
-    }
-
-    func didDetectSilence(rms: Float) -> Bool {
-        lock.lock()
-        defer { lock.unlock() }
-        let now = ProcessInfo.processInfo.systemUptime
-        if rms >= speechThreshold {
-            hasHeardSpeech = true
-            lastSpeechTime = now
-            return false
-        }
-        guard hasHeardSpeech, !didFire, now - lastSpeechTime >= silenceDuration else { return false }
-        didFire = true
         return true
     }
 }

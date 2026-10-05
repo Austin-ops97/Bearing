@@ -127,6 +127,15 @@ struct LocalModelMemoryTests {
     }
 }
 
+struct SpeechCaptureLimitTests {
+    @Test func voiceCaptureHasThirtyMinuteLimitAndReadableCountdown() {
+        #expect(SpeechCaptureController.maximumCaptureDuration == 1_800)
+        #expect(SpeechCaptureController.formattedRemainingTime(1_800) == "30:00")
+        #expect(SpeechCaptureController.formattedRemainingTime(59.1) == "1:00")
+        #expect(SpeechCaptureController.formattedRemainingTime(-1) == "0:00")
+    }
+}
+
 struct MicrosoftPriorityTests {
     @Test func priorityRulesHighlightUrgentAndCustomSenderOrKeyword() {
         let message = MicrosoftGraphMessage(

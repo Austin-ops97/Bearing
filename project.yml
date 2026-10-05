@@ -28,7 +28,7 @@ settings:
     INFOPLIST_KEY_CFBundleDisplayName: Cailyn
     INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
     INFOPLIST_KEY_NSFaceIDUsageDescription: Cailyn can use Face ID to protect your private operational information.
-    INFOPLIST_KEY_NSMicrophoneUsageDescription: Cailyn uses the microphone only while you are capturing a note. Audio is not saved.
+    INFOPLIST_KEY_NSMicrophoneUsageDescription: Cailyn uses the microphone during voice capture, including while the device is locked. Audio is not saved.
     INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: Cailyn transcribes your voice on device so you can review captured actions and shift notes.
     INFOPLIST_KEY_NSAlarmKitUsageDescription: Cailyn schedules only the prominent alarms that you review and approve.
     INFOPLIST_KEY_NSPersonalVoiceUsageDescription: Cailyn can use a Personal Voice only when you explicitly authorize it for spoken awareness.
@@ -57,6 +57,8 @@ targets:
           - CFBundleURLName: com.austinops97.Cailyn
             CFBundleURLSchemes:
               - msauth.com.austinops97.Cailyn
+        UIBackgroundModes:
+          - audio
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.austinops97.Cailyn
