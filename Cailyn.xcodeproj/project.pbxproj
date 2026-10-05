@@ -21,6 +21,7 @@
 		2ED182BAEEA8ED6E12960601 /* ActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD555DC43CACA0E9C5852042 /* ActionsView.swift */; };
 		3148289FBA1B1262375186A7 /* VoiceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE52A178C22D517379183A9 /* VoiceEngine.swift */; };
 		346AE45062291641218D0A1D /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641FF719714049D46E02EF26 /* RoutinesView.swift */; };
+		391169B8D482EB7FD62DA835 /* CailynLanguageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC943A1DAFD56F468239BC5 /* CailynLanguageModel.swift */; };
 		450F3C35358CAD17860827EE /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = 7C3A6EE9447619FF385AB39D /* MSAL */; };
 		4B134A435017E1A4AAA80365 /* PlanningEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5BFADFE21EFC0CB65F746D9 /* PlanningEngineTests.swift */; };
 		4B639BC3E31CD372A3352F99 /* SpeechCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B38EF2465C3BEE0C9DD5E7 /* SpeechCaptureController.swift */; };
@@ -72,6 +73,7 @@
 		218B2EDA880C7766B7F358C2 /* CailynSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynSearchView.swift; sourceTree = "<group>"; };
 		2D531CCFE842ED364D901B97 /* CailynLocalModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynLocalModelManager.swift; sourceTree = "<group>"; };
 		30DAF1C7B06136EAFDE8785A /* PlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
+		3DC943A1DAFD56F468239BC5 /* CailynLanguageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CailynLanguageModel.swift; sourceTree = "<group>"; };
 		48C6731FFFD3F2D423AB95B3 /* KnowledgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeView.swift; sourceTree = "<group>"; };
 		4DE82FA12CC09DB4FBEA67D9 /* AttentionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttentionEngineTests.swift; sourceTree = "<group>"; };
 		50F99D305058FD94435CAA13 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
@@ -325,6 +327,7 @@
 		ADC6568701F326F31B53C96C /* Intelligence */ = {
 			isa = PBXGroup;
 			children = (
+				3DC943A1DAFD56F468239BC5 /* CailynLanguageModel.swift */,
 				2D531CCFE842ED364D901B97 /* CailynLocalModelManager.swift */,
 				E40C3E3CAC0510429B67B2DC /* HybridIntelligenceService.swift */,
 				583B8B5A02996E16298E575C /* IntelligenceService.swift */,
@@ -520,6 +523,7 @@
 				F0E6D6F3C46ACBBBEBB4C7DF /* AttentionEngine.swift in Sources */,
 				76EE3C455738FC428A9AECE2 /* CailynApp.swift in Sources */,
 				0278D4C988E06AA8BFAA15A9 /* CailynAssistantView.swift in Sources */,
+				391169B8D482EB7FD62DA835 /* CailynLanguageModel.swift in Sources */,
 				0EC75C614AFE921FF9212C16 /* CailynLocalModelManager.swift in Sources */,
 				E16BF922444DF51FA599B621 /* CailynSearchView.swift in Sources */,
 				186F3CCCDB469AB6B06390F1 /* CailynTheme.swift in Sources */,

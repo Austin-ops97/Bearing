@@ -189,12 +189,13 @@ struct HybridIntelligenceService: IntelligenceService {
             let response = try await localManager.complete(prompt: prompt)
             let alignment = try Self.decode(LocalActionAlignment.self, from: response)
             UserDefaults.standard.set("huggingFaceLocal", forKey: "intelligence.lastSuccessfulRoute")
+            let selectedModel = await localManager.selectedModel
             return ModelAssistance(
                 value: ActionAlignmentData(
                     normalizedCommand: alignment.normalizedCommand,
                     clarificationFlags: alignment.clarificationFlags
                 ),
-                route: "On-device Qwen2.5"
+                route: "On-device \(selectedModel.displayName)"
             )
         }
         return try await AppleModelBridge.alignAction(
@@ -217,7 +218,8 @@ struct HybridIntelligenceService: IntelligenceService {
                 SentenceClassification(sourceIndex: $0.sourceIndex, category: Self.category($0.category))
             }
             UserDefaults.standard.set("huggingFaceLocal", forKey: "intelligence.lastSuccessfulRoute")
-            return ModelAssistance(value: values, route: "On-device Qwen2.5")
+            let selectedModel = await localManager.selectedModel
+            return ModelAssistance(value: values, route: "On-device \(selectedModel.displayName)")
         }
         return try await AppleModelBridge.classifyTurnover(sentences: sentences, preference: preference)
     }

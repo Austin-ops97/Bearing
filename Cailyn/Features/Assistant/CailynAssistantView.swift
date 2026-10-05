@@ -17,6 +17,8 @@ struct CailynAssistantView: View {
     @State private var sources: [String] = []
     @State private var errorMessage: String?
     @State private var isAnswering = false
+    @State private var comparison: LocalModelComparison?
+    @State private var secondModelID = ""
 
     var body: some View {
         ZStack {
@@ -24,7 +26,7 @@ struct CailynAssistantView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     VStack(alignment: .leading, spacing: 8) {
-                        SectionHeading(title: "PRIVATE APP KNOWLEDGE", trailing: model.isLoaded ? "ON-DEVICE MODEL READY" : "MODEL REQUIRED")
+                        SectionHeading(title: "PRIVATE APP KNOWLEDGE", trailing: model.isLoaded ? "\(model.selectedModel.displayName.uppercased()) READY" : "ON-DEVICE MODEL")
                         Text("Ask about your actions, events, shifts, routines, people, assets, logs, turnovers, notes, and connected work records.")
                             .font(.subheadline).foregroundStyle(.secondary)
                         Text("Cailyn retrieves only relevant records for each question. Your app data stays on-device; an answer cites the records it used and says when evidence is missing.")
@@ -43,9 +45,42 @@ struct CailynAssistantView: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-                        .disabled(isAnswering || question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.isLoaded)
-                        if !model.isLoaded {
-                            Label("Download and load the optional Qwen 3B model in Settings to use grounded Q&A.", systemImage: "arrow.down.circle")
+                        .disabled(isAnswering || question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.canUseSelectedModel)
+                        if model.downloadedModels.count >= 2 {
+                            Picker("Compare with", selection: Binding(
+                                get: {
+                                    if model.downloadedModels.contains(where: { $0.rawValue == secondModelID && $0 != model.selectedModel }) {
+                                        return secondModelID
+                                    }
+                                    return model.downloadedModels.first(where: { $0 != model.selectedModel })?.rawValue ?? ""
+                                },
+                                set: { secondModelID = $0 }
+                            )) {
+                                ForEach(model.downloadedModels.filter { $0 != model.selectedModel }) { option in
+                                    Text(option.displayName).tag(option.rawValue)
+                                }
+                            }
+                            Button {
+                                let selectedSecondModel = secondModelID.isEmpty
+                                    ? model.downloadedModels.first(where: { $0 != model.selectedModel })?.rawValue
+                                    : secondModelID
+                                Task { await ask(comparingWith: selectedSecondModel) }
+                            } label: {
+                                Label(isAnswering ? "Comparing models…" : "Compare Two Models", systemImage: "arrow.left.arrow.right")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(
+                                isAnswering
+                                    || question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                    || !model.deviceSupportsModel
+                                    || !model.selectedModelIsDownloaded
+                            )
+                            Text("Runs one model at a time and shows both answers side by side; it does not combine them into a verified answer.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                        if !model.selectedModelIsDownloaded {
+                            Label("Choose and download an on-device model in Settings to use grounded Q&A.", systemImage: "arrow.down.circle")
                                 .font(.footnote).foregroundStyle(.secondary)
                         }
                     }
@@ -58,6 +93,32 @@ struct CailynAssistantView: View {
                             if !sources.isEmpty {
                                 Divider()
                                 Text("SOURCES").font(.system(.caption, design: .monospaced, weight: .bold)).tracking(1.2)
+                                ForEach(sources, id: \.self) {
+                                    Text($0).font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .cailynSurface()
+                    }
+                    if let comparison {
+                        VStack(alignment: .leading, spacing: 14) {
+                            SectionHeading(title: "INDEPENDENT MODEL COMPARISON")
+                            Text("These are separate model outputs, not a fact-check. Compare their claims against the cited records below.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(comparison.firstModelName.uppercased())
+                                    .font(.system(.caption, design: .monospaced, weight: .bold))
+                                Text(comparison.firstAnswer).textSelection(.enabled)
+                            }
+                            Divider()
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(comparison.secondModelName.uppercased())
+                                    .font(.system(.caption, design: .monospaced, weight: .bold))
+                                Text(comparison.secondAnswer).textSelection(.enabled)
+                            }
+                            if !sources.isEmpty {
+                                Divider()
+                                Text("SHARED SOURCE RECORDS").font(.system(.caption, design: .monospaced, weight: .bold)).tracking(1.2)
                                 ForEach(sources, id: \.self) {
                                     Text($0).font(.caption).foregroundStyle(.secondary)
                                 }
@@ -83,16 +144,25 @@ struct CailynAssistantView: View {
     }
 
     @MainActor
-    private func ask() async {
+    private func ask(comparingWith secondModelID: String? = nil) async {
         isAnswering = true
         answer = nil
+        comparison = nil
         errorMessage = nil
         defer { isAnswering = false }
         do {
             let records = retrievedRecords(for: question)
             sources = records.map(\.label)
             let evidence = String(records.map { "[\($0.label)]\n\($0.content)" }.joined(separator: "\n\n").prefix(12_000))
-            answer = try await model.answer(question: question, evidence: evidence)
+            if let secondModelID {
+                comparison = try await model.compareAnswers(
+                    question: question,
+                    evidence: evidence,
+                    secondModelID: secondModelID
+                )
+            } else {
+                answer = try await model.answer(question: question, evidence: evidence)
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

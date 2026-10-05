@@ -86,6 +86,17 @@ struct LocalModelMemoryTests {
         #expect(CailynLocalModelManager.supportsModel(memoryBytes: 4_000_000_000))
         #expect(!CailynLocalModelManager.supportsModel(memoryBytes: 3_999_999_999))
     }
+
+    @Test func modelLibraryProvidesEightChoicesWithFiveDownloadLimit() {
+        #expect(CailynLanguageModel.allCases.count == 8)
+        #expect(CailynLanguageModel.maximumDownloadedModels == 5)
+        #expect(CailynLanguageModel.allCases.filter(\.isSupportedByCurrentRuntime).count == 7)
+        #expect(CailynLanguageModel.defaultModel == .qwen25)
+        #expect(CailynLanguageModel.canDownloadModel(downloadedCount: 4, isAlreadyDownloaded: false))
+        #expect(!CailynLanguageModel.canDownloadModel(downloadedCount: 5, isAlreadyDownloaded: false))
+        #expect(!CailynLanguageModel.canDownloadModel(downloadedCount: -1, isAlreadyDownloaded: false))
+        #expect(CailynLanguageModel.canDownloadModel(downloadedCount: 5, isAlreadyDownloaded: true))
+    }
 }
 
 struct MicrosoftPriorityTests {

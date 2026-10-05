@@ -121,6 +121,7 @@ struct SettingsView: View {
     @AppStorage("intelligence.modelPreference") private var modelPreference = AIModelPreference.automatic.rawValue
     @State private var intelligenceStatus = HybridIntelligenceService.runtimeStatus()
     @StateObject private var localModel = CailynLocalModelManager.shared
+    @State private var modelToRemove: CailynLanguageModel?
 
     var body: some View {
         Form {
@@ -145,27 +146,94 @@ struct SettingsView: View {
                 Text("Cailyn always runs deterministic extraction first. The selected on-device model may classify or normalize the remaining data; results are checked locally and never committed without your approval.")
             }
             Section {
-                LabeledContent("Model", value: "Qwen2.5 3B · 4-bit")
+                Picker("Selected Model", selection: Binding(
+                    get: { localModel.selectedModel.rawValue },
+                    set: { if let model = CailynLanguageModel(rawValue: $0) { localModel.selectModel(model) } }
+                )) {
+                    ForEach(CailynLanguageModel.allCases.filter(\.isSupportedByCurrentRuntime)) { model in
+                        Text(model.displayName).tag(model.rawValue)
+                    }
+                }
                 LabeledContent("Status", value: localModel.status)
+                LabeledContent("Downloaded Models", value: "\(localModel.downloadedModelIDs.count) of \(CailynLanguageModel.maximumDownloadedModels)")
                 if localModel.isLoading {
                     ProgressView(value: localModel.progress)
-                    Text("Several GB download · stored on this device").font(.footnote).foregroundStyle(.secondary)
+                    Text("Downloading or loading one model at a time").font(.footnote).foregroundStyle(.secondary)
                 }
-                if localModel.deviceSupportsModel {
-                    Button(localModel.isLoaded ? "Model Ready" : "Download & Load Model") {
-                        Task { await localModel.loadModel() }
-                    }
-                    .disabled(localModel.isLoaded || localModel.isLoading)
-                    Link("View model on Hugging Face", destination: URL(string: "https://huggingface.co/\(CailynLocalModelManager.modelIdentifier)")!)
-                } else {
+                Button(localModel.isLoaded ? "Selected Model Ready" : localModel.selectedModelIsDownloaded ? "Load Selected Model" : "Download & Load Selected Model") {
+                    Task { await localModel.loadModel() }
+                }
+                .disabled(!localModel.deviceSupportsModel || localModel.isLoaded || localModel.isLoading || (!localModel.selectedModelIsDownloaded && localModel.remainingDownloadSlots == 0))
+                Link("Open selected model on Hugging Face", destination: URL(string: "https://huggingface.co/\(localModel.selectedModel.repositoryID)")!)
+                if !localModel.deviceSupportsModel {
                     Label(localModel.deviceSupportMessage, systemImage: "exclamationmark.triangle")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             } header: {
-                Text("Optional Hugging Face Model")
+                Text("On-Device Models")
             } footer: {
-                Text("Qwen Research License · mlx-community/Qwen2.5-3B-Instruct-4bit. Tap Download & Load Model to fetch it directly from Hugging Face into Cailyn; no Hugging Face login is required. The multi-GB download needs internet once. This smaller model uses a 4-bit KV cache and bounded context to target supported physical devices with at least 4,000,000,000 bytes (4 GB) of memory. Actual availability still depends on memory used by iOS and other apps; Simulator is unsupported.")
+                Text("Models are downloaded from Hugging Face and run locally. Cailyn keeps at most five model downloads; remove one below to make room. Only one model is loaded into memory at a time. Model terms differ—review each model card and license before downloading.")
+            }
+            Section("Model Library") {
+                ForEach(CailynLanguageModel.allCases) { model in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Button {
+                                localModel.selectModel(model)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(model.displayName)
+                                        .font(.headline)
+                                        .foregroundStyle(.primary)
+                                    Text("\(model.licenseSummary) · 4-bit MLX")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!model.isSupportedByCurrentRuntime)
+                            if model == localModel.selectedModel {
+                                Image(systemName: "checkmark.circle.fill").foregroundStyle(CailynTheme.champagne)
+                            }
+                        }
+                        if let note = model.runtimeNote {
+                            Text(note).font(.footnote).foregroundStyle(.secondary)
+                            Link("View model card", destination: URL(string: "https://huggingface.co/\(model.repositoryID)")!)
+                                .font(.caption)
+                        } else {
+                            HStack {
+                                Link("Model card", destination: URL(string: "https://huggingface.co/\(model.repositoryID)")!)
+                                    .font(.caption)
+                                Spacer()
+                                if localModel.downloadedModelIDs.contains(model.rawValue) {
+                                    Label("Downloaded", systemImage: "checkmark.circle")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Button("Remove", role: .destructive) {
+                                        modelToRemove = model
+                                    }
+                                    .font(.caption)
+                                    .disabled(localModel.isLoading)
+                                } else {
+                                    Button("Download & Load") {
+                                        localModel.selectModel(model)
+                                        Task { await localModel.loadModel() }
+                                    }
+                                    .font(.caption.weight(.semibold))
+                                    .disabled(
+                                        !localModel.deviceSupportsModel
+                                            || localModel.isLoading
+                                            || localModel.remainingDownloadSlots == 0
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 5)
+                }
             }
             Section("Privacy") {
                 Label("Cailyn’s database remains on this device", systemImage: "lock.shield")
@@ -173,7 +241,10 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("SETTINGS")
-        .onAppear { refreshIntelligenceStatus() }
+        .onAppear {
+            refreshIntelligenceStatus()
+            localModel.refreshDownloadedModels()
+        }
         .onChange(of: modelPreference) { _, _ in refreshIntelligenceStatus() }
         .alert("Local Model Could Not Be Loaded", isPresented: Binding(
             get: { localModel.errorMessage != nil },
@@ -182,6 +253,27 @@ struct SettingsView: View {
             Button("OK", role: .cancel) { localModel.dismissError() }
         } message: {
             Text(localModel.errorMessage ?? "Unknown error")
+        }
+        .confirmationDialog(
+            "Remove \(modelToRemove?.displayName ?? "model")?",
+            isPresented: Binding(
+                get: { modelToRemove != nil },
+                set: { if !$0 { modelToRemove = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Remove Downloaded Files", role: .destructive) {
+                guard let model = modelToRemove else { return }
+                do {
+                    try localModel.removeDownloadedModel(model)
+                } catch {
+                    localModel.reportError(error)
+                }
+                modelToRemove = nil
+            }
+            Button("Cancel", role: .cancel) { modelToRemove = nil }
+        } message: {
+            Text("This deletes the local model files from this device. You can download the model again later.")
         }
     }
 
