@@ -8,9 +8,17 @@ struct SitrepView: View {
     @Query private var routines: [CailynRoutine]
     @Query private var events: [CailynCalendarEvent]
     @Query private var reminders: [CailynReminder]
+    @Query(sort: \CailynKnowledgeItem.modifiedAt, order: .reverse) private var knowledgeItems: [CailynKnowledgeItem]
     @State private var showsNewReminder = false
+    @State private var showsNewEvent = false
+    @State private var quickNoteText = ""
+    @State private var quickNoteError: String?
+    @State private var quickNoteToDelete: CailynKnowledgeItem?
+    @FocusState private var quickNoteIsFocused: Bool
+    @Environment(\.modelContext) private var modelContext
     let onSearch: () -> Void
     let onOverview: () -> Void
+    let onQuickAction: () -> Void
 
     private var priorityActions: [CailynAction] {
         actions.filter { $0.status != .waiting && AttentionEngine.requiresAttention($0) }
@@ -40,6 +48,7 @@ struct SitrepView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
                     header
+                    quickNotesSection
                     ViewThatFits(in: .horizontal) {
                         HStack(alignment: .top, spacing: 28) {
                             VStack(spacing: 28) { nextSection; prioritySection }.frame(maxWidth: .infinity)
@@ -59,6 +68,30 @@ struct SitrepView: View {
         .sheet(isPresented: $showsNewReminder) {
             ReminderEditorView()
         }
+        .sheet(isPresented: $showsNewEvent) {
+            EventEditorView(suggestedDate: .now)
+        }
+        .confirmationDialog(
+            "Delete this quick note?",
+            isPresented: Binding(
+                get: { quickNoteToDelete != nil },
+                set: { if !$0 { quickNoteToDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete Note", role: .destructive, action: deleteQuickNote)
+            Button("Cancel", role: .cancel) { quickNoteToDelete = nil }
+        } message: {
+            Text("This also removes the note from Cailyn Knowledge and Assistant search.")
+        }
+        .alert("Quick Note Could Not Be Saved", isPresented: Binding(
+            get: { quickNoteError != nil },
+            set: { if !$0 { quickNoteError = nil } }
+        )) {
+            Button("OK", role: .cancel) { quickNoteError = nil }
+        } message: {
+            Text(quickNoteError ?? "Unknown error")
+        }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button(action: speakBriefing) { Image(systemName: voice.isSpeaking ? "stop.circle" : "speaker.wave.2") }
@@ -66,6 +99,25 @@ struct SitrepView: View {
                 Button(action: onSearch) { Image(systemName: "magnifyingglass") }
                     .accessibilityLabel("Search Cailyn")
                     .accessibilityIdentifier("search.open")
+                Menu {
+                    Button(action: onQuickAction) {
+                        Label("Quick Action", systemImage: "bolt")
+                    }
+                    Button { showsNewEvent = true } label: {
+                        Label("Event", systemImage: "calendar.badge.plus")
+                    }
+                    Button { showsNewReminder = true } label: {
+                        Label("Reminder or Alarm", systemImage: "bell.badge")
+                    }
+                    Button {
+                        quickNoteIsFocused = true
+                    } label: {
+                        Label("Quick Note", systemImage: "note.text")
+                    }
+                } label: {
+                    Label("Quick Add", systemImage: "plus")
+                }
+                .accessibilityIdentifier("overview.quickAdd")
             }
         }
     }
@@ -184,6 +236,110 @@ struct SitrepView: View {
         }
         .buttonStyle(.plain)
         .cailynSurface()
+    }
+
+    private var quickNotesSection: some View {
+        let recentNotes = knowledgeItems
+            .filter { $0.source == "Quick Note" }
+            .prefix(3)
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                SectionHeading(title: "QUICK NOTES", trailing: "SAVES LOCALLY")
+                Spacer()
+                NavigationLink { KnowledgeView() } label: {
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(CailynTheme.champagne)
+                }
+                .accessibilityLabel("Open Knowledge")
+            }
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("Jot it down…", text: $quickNoteText, axis: .vertical)
+                    .lineLimit(1...4)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($quickNoteIsFocused)
+                    .submitLabel(.done)
+                    .onSubmit(saveQuickNote)
+                    .accessibilityIdentifier("overview.quickNote.input")
+                Button(action: saveQuickNote) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(CailynTheme.champagne)
+                }
+                .disabled(quickNoteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .accessibilityLabel("Save quick note")
+                .accessibilityIdentifier("overview.quickNote.save")
+            }
+            if recentNotes.isEmpty {
+                Text("Notes are searchable in Knowledge and available to the Assistant.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(Array(recentNotes)) { note in
+                    HStack(spacing: 10) {
+                        NavigationLink { KnowledgeDetailView(item: note) } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(note.title)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                Text(note.body)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 6)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        Menu {
+                            Button(role: .destructive) {
+                                quickNoteToDelete = note
+                            } label: {
+                                Label("Delete Quick Note", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .foregroundStyle(.secondary)
+                        }
+                        .accessibilityLabel("Quick note actions")
+                    }
+                }
+            }
+        }
+        .cailynSurface()
+        .accessibilityIdentifier("overview.quickNotes")
+    }
+
+    private func saveQuickNote() {
+        let body = quickNoteText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !body.isEmpty else { return }
+        let firstLine = body.components(separatedBy: .newlines)
+            .first?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let title = String((firstLine.isEmpty ? body : firstLine).prefix(60))
+        let note = CailynKnowledgeItem(title: title, body: body, source: "Quick Note")
+        modelContext.insert(note)
+        do {
+            try modelContext.save()
+            quickNoteText = ""
+            quickNoteIsFocused = true
+        } catch {
+            modelContext.delete(note)
+            quickNoteError = error.localizedDescription
+        }
+    }
+
+    private func deleteQuickNote() {
+        guard let note = quickNoteToDelete else { return }
+        modelContext.delete(note)
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.insert(note)
+            quickNoteError = error.localizedDescription
+        }
+        quickNoteToDelete = nil
     }
 
     private var opsSection: some View {

@@ -203,7 +203,8 @@ struct AppRootView: View {
         case .overview:
             SitrepView(
                 onSearch: { showsSearch = true },
-                onOverview: { selectRoot(.overview) }
+                onOverview: { selectRoot(.overview) },
+                onQuickAction: { openCapture(mode: .action, startsInVoice: false) }
             )
         case .plan: PlanView()
         case .events: EventsView()
